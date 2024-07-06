@@ -120,7 +120,7 @@ const Form = ({
                 <div className='text-3xl font-extrabold'>
                     Welcome {isSignInPage && "Back"}
                 </div>
-                <div className='text-xl font-light'>
+                <div className='text-xl font-light'
                     {
                         isSignInPage ? "Sign in now to get explored" : "Sign up now to get started"
                     }
