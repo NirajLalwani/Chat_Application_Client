@@ -220,7 +220,7 @@ const Dashboard = () => {
                 <hr />
                 <div className='pt-5 shadow-inner'>
                     <div className='text-primary text-xl ml-6'>Messages</div>
-                    <div className='overflow-y-scroll h-[67vh] px-6 mt-3 no-scrollbar'>
+                    <div className='overflow-y-scroll h-[67vh] px-6 mt-3 no-scrollbar vh60'>
                         {
                             userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email }, index) => {
                                 return <>
@@ -274,7 +274,7 @@ const Dashboard = () => {
                                 </div>
 
                             </div>
-                            <div className=' h-[75vh] w-full overflow-y-scroll style-scrollbar border border-bottom-black message-container'>
+                            <div className=' h-[75vh] vh70 w-full overflow-y-scroll style-scrollbar border border-bottom-black message-container'>
                                 {
                                     messagesData.messages.length > 0 ? (
 

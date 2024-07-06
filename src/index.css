@@ -203,4 +203,12 @@
     .formWidth {
         width: 75vw;
     }
+
+    .vh60 {
+        height: 60vh;
+    }
+
+    .vh70 {
+        height: 70vh;
+    }
 }
