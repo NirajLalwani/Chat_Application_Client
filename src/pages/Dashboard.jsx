@@ -373,7 +373,7 @@ const Dashboard = () => {
 
                     <div className='center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative'>
                         <figure className='rounded-full flex justify-center items-center'>
-                            <img src={messagesData.ReciverImage} alt="Image" width='140px' height='140px' className='rounded-full' />
+                            <img src={messagesData.ReciverImage} alt="Image" width='180px' height='180px' className='rounded-full' />
                         </figure>
                         <div className='text-center'>
                             <h4 className='text-xl font-semibold'>{messagesData.ReceiverName}</h4>
