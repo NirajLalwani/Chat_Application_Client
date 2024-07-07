@@ -228,24 +228,26 @@ const Dashboard = () => {
                     <div className='text-primary text-xl ml-6'>Messages</div>
                     <div className='overflow-y-scroll h-[67vh] px-6 mt-3 no-scrollbar vh60'>
                         {
-                            userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email }, index) => {
-                                return <>
-                                    <div className={`px-3 flex items-center py-2  border-b border-bottom-gray-680 border-[5x] cursor-pointer ${userId === messagesData.ReceiverId ? "bg-[#cdecfba8]" : ""} hover:bg-[#cdecfba8]`} key={index} onClick={() => {
-                                        fetchMessages(ConversationId, fullName, image, userId, email)
-                                        setConversationOpen(true)
-                                    }
-                                    }
-                                    >
-                                        <div className='w-[70px] flex justify-center items-center'>
-                                            <img src={image} alt="" className='conversationImage rounded-full  border-primary border-2' />
+                            userConversation.length > 0 ?
+                                userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email }, index) => {
+                                    return <>
+                                        <div className={`px-3 flex items-center py-2  border-b border-bottom-gray-680 border-[5x] cursor-pointer ${userId === messagesData.ReceiverId ? "bg-[#cdecfba8]" : ""} hover:bg-[#cdecfba8]`} key={index} onClick={() => {
+                                            fetchMessages(ConversationId, fullName, image, userId, email)
+                                            setConversationOpen(true)
+                                        }
+                                        }
+                                        >
+                                            <div className='w-[70px] flex justify-center items-center'>
+                                                <img src={image} alt="" className='conversationImage rounded-full  border-primary border-2' />
+                                            </div>
+                                            <div className='ml-3 w-[100%]'>
+                                                <h3 className='text-lg font-semibold w-[100%] break-words conversationName'>{fullName}</h3>
+                                                <p className='text-[12px] font-light w-[100%] break-words conversationEmail'>{email}</p>
+                                            </div>
                                         </div>
-                                        <div className='ml-3 w-[100%]'>
-                                            <h3 className='text-lg font-semibold w-[100%] break-words conversationName'>{fullName}</h3>
-                                            <p className='text-[12px] font-light w-[100%] break-words conversationEmail'>{email}</p>
-                                        </div>
-                                    </div>
-                                </>
-                            })
+                                    </>
+                                }) :
+                                <h3 className='mt-11'>No Conversation</h3>
                         }
                     </div>
                 </div>
@@ -258,6 +260,7 @@ const Dashboard = () => {
                     <HiUserAdd />
                 </div>
             </div>
+
             <div className={`w-[50%] h-screen  bg-white flex flex-col items-center chat-section ${conversationOpen && 'openConversation'}`}>
                 {
 
@@ -332,6 +335,7 @@ const Dashboard = () => {
                         <h3 className='text-center my-[50vh] translate-y-[-50%] font-semibold'>No Conversation is Selected</h3>
                 }
             </div>
+
             <div className={`w-[25%] h-screen bg-secondary addNewUserSection ${addNewFriends && "openNewFriends"}`}>
                 <div>
                     <div className='flex'>
