@@ -174,14 +174,14 @@ const Dashboard = () => {
         }
 
         //?for displaying message to receiver 
-        socket.emit('sendMessage', {
-            senderId: userData.userId,
+
+        socket.emit('updateLatestMessage', {
             receiverId: messagesData.ReceiverId,
             message: messageToBeSend,
             conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
         })
-
-        socket.emit('updateLatestMessage', {
+        socket.emit('sendMessage', {
+            senderId: userData.userId,
             receiverId: messagesData.ReceiverId,
             message: messageToBeSend,
             conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
