@@ -63,13 +63,14 @@ const Dashboard = () => {
             }));
 
 
-            let allConversation = userConversation
-
-            let index = allConversation.findIndex((curr) => {
-                return curr.ConversationId === data.conversationId;
-            })
-            allConversation[index].latestMessage = data.message
-            setUserConversations(allConversation);
+            if (userConversation.length > 0) {
+                let allConversation = userConversation
+                let index = allConversation.findIndex((curr) => {
+                    return curr.ConversationId === data.conversationId;
+                })
+                allConversation[index].latestMessage = data.message
+                setUserConversations(allConversation);
+            }
 
         });
 
