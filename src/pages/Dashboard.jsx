@@ -18,23 +18,24 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (!isLoggedIn) {
-            navigate('users/sign_in');
+            navigate('users/sign_in');  //?Navigting to signin page
         }
     }, [isLoggedIn])
 
     if (!userData || !userConversation) {
-        return <h1>Loading.....</h1>
+        return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
     }
 
-    //!For Responsive Design
+    //&For Responsive Design
     const [addNewFriends, setAddNewFriends] = useState(false)
     const [conversationOpen, setConversationOpen] = useState(false)
 
 
 
     const [messageToBeSend, setMessageToBeSend] = useState("");
-    const [socket, setSocket] = useState(io("https://chat-application-backend-q2pr.onrender.com"));
 
+    //&Socket Io
+    const [socket, setSocket] = useState(io("https://chat-application-backend-q2pr.onrender.com"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
 
@@ -75,6 +76,7 @@ const Dashboard = () => {
         });
     }, [socket])
 
+
     const scrollToBottom = () => {
         const container = document.querySelector('.message-container');
         if (container) {
@@ -85,6 +87,8 @@ const Dashboard = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messagesData])
+
+
 
     const fetchMessages = async (ConversationId, Name, Img, Id, Email) => {
         scrollToBottom();
@@ -144,17 +148,18 @@ const Dashboard = () => {
     const sendMessage = async () => {
         scrollToBottom();
 
-
         if (messagesData.conversationId === 'new') {
             var NewConversationId = await CreateConversation();
         }
 
+        //?for displaying message to receiver 
         socket.emit('sendMessage', {
             senderId: userData.userId,
             receiverId: messagesData.ReceiverId,
             message: messageToBeSend,
             conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
         })
+
         if (messageToBeSend.trim().length > 0) {
 
             const response = await fetch(`${SendMessageRoute}`, {
@@ -199,6 +204,7 @@ const Dashboard = () => {
         }
     }
 
+    //&User Details Pop up
     const [popUp, setPopUp] = useState(false)
 
     return (
@@ -331,7 +337,7 @@ const Dashboard = () => {
                     <div className='flex'>
                         <p className='text-primary px-6 py-8 text-xl'>Other Users</p>
                         <div className="close-newUsers ml-auto  text-white" onClick={() => { setAddNewFriends(false) }}>
-                            <IoMdClose className='bg-red-600 m-7 text-xl rounded-full cursor-pointer' />
+                            <IoMdClose className='bg-red-600 text-xl rounded-full cursor-pointer' />
                         </div>
                     </div>
                 </div>
@@ -373,7 +379,7 @@ const Dashboard = () => {
 
                     <div className='center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative'>
                         <figure className='rounded-full flex justify-center items-center'>
-                            <img src={messagesData.ReciverImage} alt="Image" width='180px' height='180px' className='rounded-full' />
+                            <img src={messagesData.ReciverImage} alt="Image" className='rounded-full popupImage' />
                         </figure>
                         <div className='text-center'>
                             <h4 className='text-xl font-semibold'>{messagesData.ReceiverName}</h4>

@@ -4,14 +4,24 @@ const Context = createContext();
 const UserContextProvider = ({ children }) => {
 
     const [isLoggedIn, setIsLoggedIn] = useState(true)
+    const [userConversation, setUserConversations] = useState([]);
+    const [users, setUsers] = useState([])
     const [userData, setUserData] = useState({
         userId: ""
     });
-    const [userConversation, setUserConversations] = useState([]);
+
+    //?It consits data of receiver along with sender and receiver conversation id
+    const [messagesData, setMessagesData] = useState({
+        ReceiverId: "",
+        ReceiverName: "",
+        ReceiverImage: "",
+        ReceiverEmail: "",
+        messages: [],
+        conversationId: ""
+    })
 
 
-
-    const GetUserConversations = async (Id) => {
+    const GetUserConversations = async (Id) => {    //?Called when user is valid
         const response = await fetch(`${GetConversationRoute}/${Id}`)
         const data = await response.json();
         if (response.status === 200) {
@@ -21,13 +31,14 @@ const UserContextProvider = ({ children }) => {
         }
     }
 
-    const [users, setUsers] = useState([])
-    const fetchAllUsers = async () => {
+    //?Getting all userData
+    const fetchAllUsers = async () => {         //?Called when user is valid
         const response = await fetch(GetAllUsersDataRoute);
         const resData = await response.json();
         setUsers(resData.Data);
     }
 
+    //?Function For Checking token is valid or not
     const AuthorizeUser = async (token) => {
         const response = await fetch(`${GetUserDataRoute}/${token}`)
         const data = await response.json();
@@ -44,23 +55,12 @@ const UserContextProvider = ({ children }) => {
         }
     }
 
-    const [messagesData, setMessagesData] = useState({
-        ReceiverId: "",
-        ReceiverName: "",
-        ReceiverImage: "",
-        ReceiverEmail: "",
-        messages: [],
-        conversationId: ""
-    })
 
-
-
-
+    //?filterUsers is displyed on Add new user if new userConversation is added then again filter users  
     const [filterUsers, setFilterConversation] = useState([])
-
     useEffect(() => {
-        const filteredUsers = users.filter((user) => {
-            const hasConversation = userConversation.some((conversation) => {
+        const filteredUsers = users.filter((user) => {                              //?users var conisists of all users
+            const hasConversation = userConversation.some((conversation) => {      //?Finding current user in userConversation if it exists don't return it
                 return user._id === conversation.userId;
             });
 
@@ -76,7 +76,7 @@ const UserContextProvider = ({ children }) => {
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (storedToken) {
-            AuthorizeUser(storedToken);
+            AuthorizeUser(storedToken); //?Verify That token is valid or not if token is valid currently logged in user data is setted in state Variable
         } else {
             setIsLoggedIn(false)
         }

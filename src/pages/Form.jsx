@@ -125,68 +125,68 @@ const Form = ({
                     {isSignInPage ? "Sign in now to get explored" : "Sign up now to get started"}
                 </div>
 
-            <form className='w-full my-4'>
-                {
-                    !isSignInPage &&
+                <form className='w-full my-4'>
+                    {
+                        !isSignInPage &&
+                        <Input
+                            type='text'
+                            label='Full name'
+                            name='name'
+                            placeholder='Enter Your Name'
+                            isRequired={true}
+                            value={data.fullName}
+                            onChange={(e) => setData({ ...data, fullName: e.target.value })}
+                        />
+                    }
                     <Input
-                        type='text'
-                        label='Full name'
-                        name='name'
-                        placeholder='Enter Your Name'
+                        type='email'
+                        label='Email address'
+                        name='email'
+                        placeholder='Enter Your Email'
                         isRequired={true}
-                        value={data.fullName}
-                        onChange={(e) => setData({ ...data, fullName: e.target.value })}
+                        value={data.email}
+                        onChange={(e) => setData({ ...data, email: e.target.value })}
                     />
-                }
-                <Input
-                    type='email'
-                    label='Email address'
-                    name='email'
-                    placeholder='Enter Your Email'
-                    isRequired={true}
-                    value={data.email}
-                    onChange={(e) => setData({ ...data, email: e.target.value })}
-                />
-                <Input
-                    type='password'
-                    label='Password'
-                    name='password'
-                    placeholder='Enter Your Password'
-                    isRequired={true}
-                    value={data.password}
-                    onChange={(e) => setData({ ...data, password: e.target.value })}
-                />
-                {
-                    (!isSignInPage && data.image === '') &&
                     <Input
-                        type='file'
-                        label='Profile Picture'
-                        onChange={(e) => {
-                            setData({ ...data, image: e.target.files[0] })
-                        }
-                        }
+                        type='password'
+                        label='Password'
+                        name='password'
+                        placeholder='Enter Your Password'
+                        isRequired={true}
+                        value={data.password}
+                        onChange={(e) => setData({ ...data, password: e.target.value })}
                     />
-                }
+                    {
+                        (!isSignInPage && data.image === '') &&
+                        <Input
+                            type='file'
+                            label='Profile Picture'
+                            onChange={(e) => {
+                                setData({ ...data, image: e.target.files[0] })
+                            }
+                            }
+                        />
+                    }
 
-                {(!isSignInPage && data.image !== '') && <h2>File Selected</h2>}
+                    {(!isSignInPage && data.image !== '') && <h2>File Selected</h2>}
 
 
 
-                <div onClick={(e) => HandleSubmit()} >
-                    <Button label={isSignInPage ? "Sign in" : "Sing up"} className='mt-3 mb-2' />
-                </div>
-                <div >
-                    {isSignInPage ? "Don't" : "Already"} have an account ? <Link
+                    <div onClick={(e) => HandleSubmit()} >
+                        <Button label={isSignInPage ? "Sign in" : "Sing up"} className='mt-3 mb-2' />
+                    </div>
+                    <div >
+                        {isSignInPage ? "Don't" : "Already"} have an account ? <Link
 
-                        className='text-primary cursor-pointer underline'
-                        to={isSignInPage ? "/users/sign_up" : "/users/sign_in"}
-                    >
-                        {!isSignInPage ? "Sign in" : "Sign up"}
+                            className='text-primary cursor-pointer underline'
+                            to={isSignInPage ? "/users/sign_up" : "/users/sign_in"}
+                        >
+                            {!isSignInPage ? "Sign in" : "Sign up"}
 
-                    </Link>
-                </div>
-            </form>
-        </div >
+                        </Link>
+                    </div>
+                </form>
+            </div >
             <ToastContainer
                 position="top-right"
                 autoClose={5000}

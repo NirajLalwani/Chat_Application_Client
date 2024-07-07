@@ -90,6 +90,10 @@
     -o-transition: ;
 }
 
+.popupImage{
+    height: 180px;
+    width: 180px;
+}
 
 @media (max-width: 1024px) {
 
