@@ -36,6 +36,7 @@ const Dashboard = () => {
 
     //&Socket Io
     const [socket, setSocket] = useState(io("https://chat-application-backend-q2pr.onrender.com"));
+    // const [socket, setSocket] = useState(io("http://localhost:8000"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
 
@@ -62,20 +63,7 @@ const Dashboard = () => {
                 messages: [...prev.messages, data]
             }));
 
-
-            if (userConversation.length > 0) {
-                let allConversation = userConversation
-                let index = allConversation.findIndex((curr) => {
-                    return curr.ConversationId === data.conversationId;
-                })
-                if (index !== -1) {
-                    allConversation[index].latestMessage = data.message
-                    setUserConversations(allConversation);
-                }
-            }
-
         });
-
 
         socket.on('getConversation', (data) => {
             setUserConversations(prev => ([
@@ -92,6 +80,22 @@ const Dashboard = () => {
         });
     }, [socket])
 
+
+    useEffect(() => {
+        socket.on('getLatestMessage', (data) => {
+            console.log("Called");
+            if (userConversation.length > 0) {
+                let allConversation = userConversation
+                let index = allConversation.findIndex((curr) => {
+                    return curr.ConversationId === data.conversationId;
+                })
+                if (index !== -1) {
+                    allConversation[index].latestMessage = data.message
+                    setUserConversations(allConversation);
+                }
+            }
+        })
+    }, [socket, userConversation])
 
     const scrollToBottom = () => {
         const container = document.querySelector('.message-container');
@@ -172,6 +176,12 @@ const Dashboard = () => {
         //?for displaying message to receiver 
         socket.emit('sendMessage', {
             senderId: userData.userId,
+            receiverId: messagesData.ReceiverId,
+            message: messageToBeSend,
+            conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
+        })
+
+        socket.emit('updateLatestMessage', {
             receiverId: messagesData.ReceiverId,
             message: messageToBeSend,
             conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
