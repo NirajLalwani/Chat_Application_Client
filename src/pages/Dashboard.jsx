@@ -68,8 +68,10 @@ const Dashboard = () => {
                 let index = allConversation.findIndex((curr) => {
                     return curr.ConversationId === data.conversationId;
                 })
-                allConversation[index].latestMessage = data.message
-                setUserConversations(allConversation);
+                if (index !== -1) {
+                    allConversation[index].latestMessage = data.message
+                    setUserConversations(allConversation);
+                }
             }
 
         });
@@ -88,7 +90,7 @@ const Dashboard = () => {
             ]
             ));
         });
-    }, [socket, userConversation])
+    }, [socket])
 
 
     const scrollToBottom = () => {
