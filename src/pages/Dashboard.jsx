@@ -88,7 +88,7 @@ const Dashboard = () => {
             ]
             ));
         });
-    }, [socket])
+    }, [socket, userConversation])
 
 
     const scrollToBottom = () => {
