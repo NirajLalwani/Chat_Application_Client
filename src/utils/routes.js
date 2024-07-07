@@ -1,4 +1,4 @@
-// const defaultRoute = 'http://localhost:8000/api'
+// export const defaultRoute = 'http://localhost:8000/api'
 export const defaultRoute = 'https://chat-application-backend-q2pr.onrender.com/api'
 
 export const registerRoute = `${defaultRoute}/register`;

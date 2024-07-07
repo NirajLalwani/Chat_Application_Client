@@ -56,11 +56,24 @@ const Dashboard = () => {
 
     useEffect(() => {
         socket.on('getMessage', (data) => {
+
             setMessagesData(prev => ({
                 ...prev,
                 messages: [...prev.messages, data]
             }));
+
+
+            let allConversation = userConversation
+
+            let index = allConversation.findIndex((curr) => {
+                return curr.ConversationId === data.conversationId;
+            })
+            allConversation[index].latestMessage = data.message
+            setUserConversations(allConversation);
+
         });
+
+
         socket.on('getConversation', (data) => {
             setUserConversations(prev => ([
                 ...prev,
@@ -102,6 +115,7 @@ const Dashboard = () => {
             conversationId: ConversationId,
             ReceiverEmail: Email
         })
+        console.log("Fetch Messaage Called")
     }
 
     const CreateConversation = async () => {
@@ -200,6 +214,13 @@ const Dashboard = () => {
                 }]
             }));
 
+            let allConversation = userConversation
+
+            let index = allConversation.findIndex((curr) => {
+                return curr.ConversationId === conversationId;
+            })
+            allConversation[index].latestMessage = messageToBeSend
+            setUserConversations(allConversation);
             setMessageToBeSend("")
         }
     }
@@ -229,7 +250,7 @@ const Dashboard = () => {
                     <div className='overflow-y-scroll h-[67vh] px-6 mt-3 no-scrollbar vh60'>
                         {
                             userConversation.length > 0 ?
-                                userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email }, index) => {
+                                userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email, latestMessage }, index) => {
                                     return <>
                                         <div className={`px-3 flex items-center py-2  border-b border-bottom-gray-680 border-[5x] cursor-pointer ${userId === messagesData.ReceiverId ? "bg-[#cdecfba8]" : ""} hover:bg-[#cdecfba8]`} key={index} onClick={() => {
                                             fetchMessages(ConversationId, fullName, image, userId, email)
@@ -242,7 +263,7 @@ const Dashboard = () => {
                                             </div>
                                             <div className='ml-3 w-[100%]'>
                                                 <h3 className='text-lg font-semibold w-[100%] break-words conversationName'>{fullName}</h3>
-                                                <p className='text-[12px] font-light w-[100%] break-words conversationEmail'>{email}</p>
+                                                <p className='text-[12px] font-light w-[100%] break-words conversationEmail'>{latestMessage}</p>
                                             </div>
                                         </div>
                                     </>
@@ -315,9 +336,10 @@ const Dashboard = () => {
                                 }
                             </div>
                             <div className="w-full px-4 flex  gap-1">
-                                <Input placeholder='Type Your Message...' name='text' type='text' className='shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage' value={messageToBeSend} onChange={(e) => {
-                                    setMessageToBeSend(e.target.value)
-                                }}
+                                <Input placeholder='Type Your Message...' name='text' type='text' className='shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage' value={messageToBeSend}
+                                    onChange={(e) => {
+                                        setMessageToBeSend(e.target.value)
+                                    }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             sendMessage();
