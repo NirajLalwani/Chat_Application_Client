@@ -247,7 +247,7 @@ const Dashboard = () => {
                                         </div>
                                     </>
                                 }) :
-                                <h3 className='mt-11'>No Conversation</h3>
+                                <h3 className='mt-20 text-center'>No Conversation</h3>
                         }
                     </div>
                 </div>
