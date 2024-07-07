@@ -35,7 +35,7 @@ const Dashboard = () => {
     const [messageToBeSend, setMessageToBeSend] = useState("");
 
     //&Socket Io
-    const [socket, setSocket] = useState(io("https://chat-application-backend-q2pr.onrender.com"));
+    const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
     // const [socket, setSocket] = useState(io("http://localhost:8000"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
