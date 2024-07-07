@@ -130,7 +130,7 @@ const Form = ({
                         !isSignInPage &&
                         <Input
                             type='text'
-                            label='Full name'
+                            label='Full name *'
                             name='name'
                             placeholder='Enter Your Name'
                             isRequired={true}
@@ -140,7 +140,7 @@ const Form = ({
                     }
                     <Input
                         type='email'
-                        label='Email address'
+                        label='Email address *'
                         name='email'
                         placeholder='Enter Your Email'
                         isRequired={true}
@@ -149,7 +149,7 @@ const Form = ({
                     />
                     <Input
                         type='password'
-                        label='Password'
+                        label='Password *'
                         name='password'
                         placeholder='Enter Your Password'
                         isRequired={true}
