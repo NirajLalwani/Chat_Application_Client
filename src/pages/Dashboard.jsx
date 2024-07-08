@@ -57,7 +57,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         socket.on('getMessage', (data) => {
-
+            setMessageToBeSend("")
             setMessagesData(prev => ({
                 ...prev,
                 messages: [...prev.messages, data]
@@ -83,7 +83,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         socket.on('getLatestMessage', (data) => {
-            console.log("Called");
             if (userConversation.length > 0) {
                 let allConversation = userConversation
                 let index = allConversation.findIndex((curr) => {
@@ -217,16 +216,6 @@ const Dashboard = () => {
                 })
             }
 
-
-            // setMessagesData(prev => ({
-            //     ...prev,
-            //     messages: [...prev.messages, {
-            //         conversationId,
-            //         senderId: userData.userId,
-            //         message: messageToBeSend,
-            //     }]
-            // }));
-
             let allConversation = userConversation
 
             let index = allConversation.findIndex((curr) => {
@@ -234,7 +223,6 @@ const Dashboard = () => {
             })
             allConversation[index].latestMessage = messageToBeSend
             setUserConversations(allConversation);
-            setMessageToBeSend("")
         }
     }
 
