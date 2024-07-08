@@ -248,7 +248,7 @@ const Dashboard = () => {
     return (
         <div className='w-screen flex'>
             <div className='w-[25%] h-screen  bg-secondary conversation-section'>
-                <div className='flex justify-center items-center my-5 h-[15vh] profile-section'>
+                <div className='flex justify-center items-center my-5 h-[15vh] profile-section '>
                     <img src={userData.image} alt="" className='rounded-full profileImage border-primary border-2' />
                     <div className='ml-3'>
                         <h3 className='text-xl font-semibold accountName'>{userData.fullName}</h3>
