@@ -196,6 +196,10 @@ const Dashboard = () => {
             let hours = now.getHours();
             let minutes = now.getMinutes();
 
+            if (minutes < 10) {
+                minutes = 0 + minutes
+            }
+
             let time = `${hours}:${minutes}`
 
             const response = await fetch(`${SendMessageRoute}`, {
@@ -212,6 +216,7 @@ const Dashboard = () => {
             })
             const resData = await response.json();
 
+            setMessageToBeSend('');
 
             const conversationId = (messagesData.conversationId === 'new') ? resData.conversationId : messagesData.conversationId;
 
@@ -226,7 +231,6 @@ const Dashboard = () => {
                 })
             }
 
-            setMessageToBeSend('');
         }
     }
 
