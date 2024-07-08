@@ -177,6 +177,14 @@ const Dashboard = () => {
 
         if (messageToBeSend.trim().length > 0) {
 
+            let now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            if (minutes < 10) {
+                minutes = '0' + minutes
+            }
+            let time = `${hours}:${minutes}`
+
             socket.emit('updateLatestMessage', {
                 receiverId: messagesData.ReceiverId,
                 senderId: userData.userId,
@@ -188,19 +196,11 @@ const Dashboard = () => {
                 senderId: userData.userId,
                 receiverId: messagesData.ReceiverId,
                 message: messageToBeSend,
-                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
+                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
+                time
             })
 
-            let now = new Date();
 
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-
-            if (minutes < 10) {
-                minutes = '0' + minutes
-            }
-
-            let time = `${hours}:${minutes}`
 
             const response = await fetch(`${SendMessageRoute}`, {
                 method: "POST",
@@ -321,15 +321,19 @@ const Dashboard = () => {
                                         <div className='px-8 py-10 flex flex-col gap-5'>
 
                                             {
-                                                messagesData.messages.map(({ senderId, message }, index) => (
+                                                messagesData.messages.map(({ senderId, message, time }, index) => (
                                                     (senderId == userData.userId) ? (
                                                         <div key={index} className='p-3 max-w-[52%] border bg-primary rounded-b-xl rounded-tl-xl text-sm ml-auto text-white message'
                                                             style={{ wordWrap: 'break-word' }}
-                                                        >{message}</div>
+                                                        >{message}
+                                                            <span className='message-time text-white'>{time}</span>
+                                                        </div>
                                                     ) : (
                                                         <div key={index} className='p-3  max-w-[52%]  bg-secondary rounded-b-xl rounded-tr-xl text-sm mr-auto message'
                                                             style={{ wordWrap: 'break-word' }}
-                                                        >{message}</div>
+                                                        >{message}
+                                                            <span className='message-time'>{time}</span>
+                                                        </div>
                                                     )
                                                 )
                                                 )

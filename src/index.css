@@ -74,7 +74,17 @@
 }
 
 
+.message {
+    position: relative;
+}
 
+.message-time {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 12px;
+    font-weight: lighter;
+}
 
 
 .close-newUsers {
@@ -90,7 +100,7 @@
     -o-transition: ;
 }
 
-.popupImage{
+.popupImage {
     height: 180px;
     width: 180px;
 }
