@@ -39,7 +39,7 @@ const Dashboard = () => {
     // const [socket, setSocket] = useState(io("http://localhost:8000"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
-
+    //?For addUser and getUser in socket
     useEffect(() => {
         socket.emit('addUser', userData.userId)
         socket.on('getUsers', (users) => {
@@ -54,7 +54,7 @@ const Dashboard = () => {
     }, [socket, userData.userId])
 
 
-
+    //?For getting Messages
     useEffect(() => {
         socket.on('getMessage', (data) => {
 
@@ -81,6 +81,7 @@ const Dashboard = () => {
     }, [socket])
 
 
+    //?For Getting Latest Messages
     useEffect(() => {
         socket.on('getLatestMessage', (data) => {
             if (userConversation.length > 0) {
@@ -95,6 +96,7 @@ const Dashboard = () => {
             }
         })
     }, [socket, userConversation])
+
 
     const scrollToBottom = () => {
         const container = document.querySelector('.message-container');
@@ -172,22 +174,29 @@ const Dashboard = () => {
             var NewConversationId = await CreateConversation();
         }
 
-        //?for displaying message to receiver 
-
-        socket.emit('updateLatestMessage', {
-            receiverId: messagesData.ReceiverId,
-            senderId: userData.userId,
-            message: messageToBeSend,
-            conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
-        })
-        socket.emit('sendMessage', {
-            senderId: userData.userId,
-            receiverId: messagesData.ReceiverId,
-            message: messageToBeSend,
-            conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
-        })
 
         if (messageToBeSend.trim().length > 0) {
+
+            socket.emit('updateLatestMessage', {
+                receiverId: messagesData.ReceiverId,
+                senderId: userData.userId,
+                message: messageToBeSend,
+                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
+            })
+
+            socket.emit('sendMessage', {
+                senderId: userData.userId,
+                receiverId: messagesData.ReceiverId,
+                message: messageToBeSend,
+                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
+            })
+
+            let now = new Date();
+
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+
+            let time = `${hours}:${minutes}`
 
             const response = await fetch(`${SendMessageRoute}`, {
                 method: "POST",
@@ -198,7 +207,7 @@ const Dashboard = () => {
                     conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
                     senderId: userData.userId,
                     message: messageToBeSend,
-                    receiverId: messagesData.ReceiverId
+                    time: time
                 })
             })
             const resData = await response.json();
