@@ -218,14 +218,14 @@ const Dashboard = () => {
             }
 
 
-            setMessagesData(prev => ({
-                ...prev,
-                messages: [...prev.messages, {
-                    conversationId,
-                    senderId: userData.userId,
-                    message: messageToBeSend,
-                }]
-            }));
+            // setMessagesData(prev => ({
+            //     ...prev,
+            //     messages: [...prev.messages, {
+            //         conversationId,
+            //         senderId: userData.userId,
+            //         message: messageToBeSend,
+            //     }]
+            // }));
 
             let allConversation = userConversation
 
