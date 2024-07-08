@@ -57,7 +57,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         socket.on('getMessage', (data) => {
-            setMessageToBeSend("")
+
             setMessagesData(prev => ({
                 ...prev,
                 messages: [...prev.messages, data]
@@ -223,6 +223,7 @@ const Dashboard = () => {
             })
             allConversation[index].latestMessage = messageToBeSend
             setUserConversations(allConversation);
+            setMessageToBeSend('');
         }
     }
 
