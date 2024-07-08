@@ -78,7 +78,7 @@
     position: relative;
 }
 
-.message:before {
+.message::before {
     content: "";
     position: absolute;
     bottom: -10px;
