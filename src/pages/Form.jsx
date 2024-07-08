@@ -122,7 +122,7 @@ const Form = ({
                 </div>
 
                 <div className='text-xl font-light'>
-                    {isSignInPage ? "Sign in now to get explored" : "Sign up now to get started"}
+                    {isSignInPage ? " Your journey continues here" : "Sign up now to get started"}
                 </div>
 
                 <form className='w-full my-4'>
@@ -173,7 +173,7 @@ const Form = ({
 
 
                     <div onClick={(e) => HandleSubmit()} >
-                        <Button label={isSignInPage ? "Sign in" : "Sing up"} className='mt-3 mb-2' />
+                        <Button label={isSignInPage ? "Sign in" : "Sign up"} className='mt-3 mb-2' />
                     </div>
                     <div >
                         {isSignInPage ? "Don't" : "Already"} have an account ? <Link

@@ -91,6 +91,7 @@ const Dashboard = () => {
                 })
                 if (index !== -1) {
                     allConversation[index].latestMessage = data.message
+                    allConversation[index].time = data.time
                     setUserConversations(allConversation);
                 }
             }
@@ -180,16 +181,21 @@ const Dashboard = () => {
             let now = new Date();
             let hours = now.getHours();
             let minutes = now.getMinutes();
+            let month = now.getMonth() + 1;
+            let year = now.getFullYear();
+            let date = now.getDate();
             if (minutes < 10) {
                 minutes = '0' + minutes
             }
             let time = `${hours}:${minutes}`
+            let Fulldate = `${date}/${month}/${year}`
 
             socket.emit('updateLatestMessage', {
                 receiverId: messagesData.ReceiverId,
                 senderId: userData.userId,
                 message: messageToBeSend,
-                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
+                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
+                time
             })
 
             socket.emit('sendMessage', {
@@ -197,7 +203,8 @@ const Dashboard = () => {
                 receiverId: messagesData.ReceiverId,
                 message: messageToBeSend,
                 conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
-                time
+                time,
+                date: Fulldate
             })
 
 
@@ -211,7 +218,8 @@ const Dashboard = () => {
                     conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
                     senderId: userData.userId,
                     message: messageToBeSend,
-                    time: time
+                    time: time,
+                    date: Fulldate
                 })
             })
             const resData = await response.json();
@@ -259,7 +267,7 @@ const Dashboard = () => {
                     <div className='overflow-y-scroll h-[67vh] px-6 mt-3 no-scrollbar vh60'>
                         {
                             userConversation.length > 0 ?
-                                userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email, latestMessage }, index) => {
+                                userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email, latestMessage, time }, index) => {
                                     return <>
                                         <div className={`px-3 flex items-center py-2  border-b border-bottom-gray-680 border-[5x] cursor-pointer ${userId === messagesData.ReceiverId ? "bg-[#cdecfba8]" : ""} hover:bg-[#cdecfba8]`} key={index} onClick={() => {
                                             fetchMessages(ConversationId, fullName, image, userId, email)
@@ -271,8 +279,15 @@ const Dashboard = () => {
                                                 <img src={image} alt="" className='conversationImage rounded-full  border-primary border-2' />
                                             </div>
                                             <div className='ml-3 w-[100%]'>
-                                                <h3 className='text-lg font-semibold w-[100%] break-words conversationName'>{fullName}</h3>
-                                                <p className='text-[12px] font-light w-[100%] break-words conversationEmail'>{latestMessage}</p>
+                                                <h3 className='text-lg font-semibold w-[100%] break-words conversationName flex justify-between items-center'>
+
+                                                    <span>{fullName}</span>
+                                                    <span className={`h-3 w-3 rounded-full ${onlineUsers.find(curr => curr.userId === userId) ? "bg-green-600" : "bg-red-600"}`}></span>
+                                                </h3>
+                                                <p className='text-[12px] font-light w-[100%] break-words conversationEmail flex justify-between items-center'>
+                                                    <span>{latestMessage}</span>
+                                                    <span>{time}</span>
+                                                </p>
                                             </div>
                                         </div>
                                     </>
@@ -321,20 +336,47 @@ const Dashboard = () => {
                                         <div className='px-8 py-10 flex flex-col gap-5'>
 
                                             {
-                                                messagesData.messages.map(({ senderId, message, time }, index) => (
-                                                    (senderId == userData.userId) ? (
-                                                        <div key={index} className='p-3 max-w-[52%] border bg-primary rounded-b-xl rounded-tl-xl text-sm ml-auto text-white message'
-                                                            style={{ wordWrap: 'break-word' }}
-                                                        >{message}
-                                                            <span className='message-time text-white'>{time}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <div key={index} className='p-3  max-w-[52%]  bg-secondary rounded-b-xl rounded-tr-xl text-sm mr-auto message'
-                                                            style={{ wordWrap: 'break-word' }}
-                                                        >{message}
-                                                            <span className='message-time'>{time}</span>
-                                                        </div>
-                                                    )
+                                                messagesData.messages.map(({ senderId, message, time, date }, index) => (
+                                                    <>
+                                                        {
+                                                            (index === 0) ? (
+
+                                                                <div className='px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
+                                                                    style={{ wordWrap: 'break-word' }}
+                                                                >
+                                                                    {date}
+                                                                </div>
+                                                            ) : (
+
+                                                                (date !== messagesData.messages[index - 1].date) && <div key={index} className='px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
+                                                                    style={{ wordWrap: 'break-word' }}
+                                                                >
+                                                                    {date}
+                                                                </div>
+
+                                                            )
+                                                        }
+
+                                                        {
+
+                                                            (senderId == userData.userId) ? (
+                                                                <div className='p-3 py-1 max-w-[52%] border bg-primary rounded-b-xl rounded-tl-xl text-sm ml-auto text-white pr-11 message'
+                                                                    style={{ wordWrap: 'break-word' }}
+                                                                >
+                                                                    {message}
+                                                                    <span className='message-time message-time-sender text-white'>{time}</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className='p-3 py-1  max-w-[52%]  bg-secondary rounded-b-xl rounded-tr-xl text-sm mr-auto pr-11 message'
+                                                                    style={{ wordWrap: 'break-word' }}
+                                                                >
+                                                                    {message}
+                                                                    <span className='message-time message-time-receiver'>{time}</span>
+                                                                </div>
+                                                            )
+                                                        }
+
+                                                    </>
                                                 )
                                                 )
                                             }
@@ -394,14 +436,17 @@ const Dashboard = () => {
                                             messages: [],
                                             conversationId: 'new',
                                             ReceiverEmail: email
-
                                         })
                                         setAddNewFriends(false)
                                         setConversationOpen(true)
                                     }}>
                                         <img src={image} alt="" className='rounded-full conversationImage  border-primary border-2' />
-                                        <div className='ml-3'>
-                                            <h3 className='text-lg font-semibold'>{fullName}</h3>
+                                        <div className='ml-3 w-[100%]'>
+                                            <h3 className='text-lg font-semibold flex justify-between items-center w-[100%]'>
+
+                                                <span>{fullName}</span>
+                                                <span className={`h-3 w-3 rounded-full ${onlineUsers.find(curr => curr.userId === _id) ? "bg-green-600" : "bg-red-600"}`}></span>
+                                            </h3>
                                             <p className='text-[12px] font-light'>{email}</p>
                                         </div>
                                     </div >
