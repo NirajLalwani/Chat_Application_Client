@@ -176,6 +176,7 @@ const Dashboard = () => {
 
         socket.emit('updateLatestMessage', {
             receiverId: messagesData.ReceiverId,
+            senderId: userData.userId,
             message: messageToBeSend,
             conversationId: NewConversationId ? NewConversationId : messagesData.conversationId
         })
@@ -216,13 +217,6 @@ const Dashboard = () => {
                 })
             }
 
-            let allConversation = userConversation
-
-            let index = allConversation.findIndex((curr) => {
-                return curr.ConversationId === conversationId;
-            })
-            allConversation[index].latestMessage = messageToBeSend
-            setUserConversations(allConversation);
             setMessageToBeSend('');
         }
     }
