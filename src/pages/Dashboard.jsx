@@ -360,14 +360,14 @@ const Dashboard = () => {
                                                         {
 
                                                             (senderId == userData.userId) ? (
-                                                                <div className='p-3 py-1 max-w-[52%] border bg-primary rounded-b-xl rounded-tl-xl text-sm ml-auto text-white pr-11 message'
+                                                                <div className='p-3 py-1 max-w-[52%] border bg-primary rounded-b-lg rounded-tl-lg text-sm ml-auto text-white pr-11 message'
                                                                     style={{ wordWrap: 'break-word' }}
                                                                 >
                                                                     {message}
                                                                     <span className='message-time message-time-sender text-white'>{time}</span>
                                                                 </div>
                                                             ) : (
-                                                                <div className='p-3 py-1  max-w-[52%]  bg-secondary rounded-b-xl rounded-tr-xl text-sm mr-auto pr-11 message'
+                                                                <div className='p-3 py-1  max-w-[52%]  bg-secondary rounded-b-lg rounded-tr-lg text-sm mr-auto pr-11 message'
                                                                     style={{ wordWrap: 'break-word' }}
                                                                 >
                                                                     {message}
