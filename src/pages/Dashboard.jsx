@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Input from '../components/Input'
 import { useNavigate } from 'react-router-dom'
 import { useUserContext } from '../context/UserContext'
-import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, defaultRoute } from '../utils/routes'
+import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute } from '../utils/routes'
 import { io } from 'socket.io-client'
 
 import { LuSend } from "react-icons/lu";
 import { HiUserAdd } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io";
 import { IoMdArrowBack } from "react-icons/io";
-
+import { BsThreeDotsVertical } from "react-icons/bs";
 const Dashboard = () => {
 
     const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filteredUser } = useUserContext();
@@ -26,14 +26,21 @@ const Dashboard = () => {
         return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
     }
 
+    //&Message section more options
+    const [showMoreOptions, setShowMoreOptions] = useState(false)
+
+    //&User Details Pop up
+    const [popUp, setPopUp] = useState(false)
+
     //&For Responsive Design
     const [addNewFriends, setAddNewFriends] = useState(false)
     const [conversationOpen, setConversationOpen] = useState(false)
 
 
-
+    //&Current Message
     const [messageToBeSend, setMessageToBeSend] = useState("");
 
+    //******************************************************************************************************************************  */
     //&Socket Io
     const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
     // const [socket, setSocket] = useState(io("http://localhost:8000"));
@@ -78,6 +85,13 @@ const Dashboard = () => {
             ]
             ));
         });
+
+        socket.on('getClearedChat', (data) => {
+            setMessagesData({
+                ...messagesData,
+                messages: data.messages
+            })
+        })
     }, [socket])
 
 
@@ -98,6 +112,9 @@ const Dashboard = () => {
         })
     }, [socket, userConversation])
 
+
+
+    //******************************************************************************************************************************  */
 
     const scrollToBottom = () => {
         const container = document.querySelector('.message-container');
@@ -242,8 +259,31 @@ const Dashboard = () => {
         }
     }
 
-    //&User Details Pop up
-    const [popUp, setPopUp] = useState(false)
+    const delteConversation = async () => {
+        setShowMoreOptions(false)
+    }
+    const clearChat = async () => {
+        setShowMoreOptions(false)
+        const res = await fetch(ClearChatRoute, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "conversationId": messagesData.conversationId,
+                "senderId": userData.userId,
+                "receiverId": messagesData.ReceiverId
+            })
+        })
+        if (res.ok) {
+            socket.emit('clearChat', { 'senderId': userData.userId, 'receiverId': messagesData.ReceiverId })
+            const resData = await res.json();
+        }
+        console.log(resData);
+    }
+
+
+
 
     return (
         <div className='w-screen flex'>
@@ -313,22 +353,41 @@ const Dashboard = () => {
                         <>
                             <div className='w-[80%] px-8 bg-secondary h-[60px] mt-6 rounded-full flex justify-start items-center gap-3 p-9 mb-3'>
                                 <IoMdArrowBack className='text-xl cursor-pointer' onClick={() => { setConversationOpen(false) }} />
-                                <figure>
+                                <figure className='w-[15%]'>
                                     <img src={messagesData.ReciverImage} alt="" className='conversationImage rounded-full  border-primary border-2 cursor-pointer' onClick={() => {
                                         setPopUp(true)
                                     }} />
                                 </figure>
-                                <div>
-                                    <h3 className='text-sm font-bold'>{messagesData.ReceiverName}</h3>
-                                    <p className='text-[12px] font-light'>
+                                <div className='flex justify-between items-center w-[100%]'>
+                                    <div>
+
+                                        <h3 className='text-sm font-bold'>{messagesData.ReceiverName}</h3>
+                                        <p className='text-[12px] font-light'>
+                                            {
+                                                onlineUsers.find(curr => curr.userId === messagesData.ReceiverId) ? "Online" : "Offline"
+                                            }
+                                        </p>
+                                    </div>
+                                    <div className={`cursor-pointer ${showMoreOptions && "bg-white"} rounded-full relative`}
+                                        onClick={() => showMoreOptions ? setShowMoreOptions(false) : setShowMoreOptions(true)}
+                                    >
+                                        <BsThreeDotsVertical className='m-2' />
                                         {
-                                            onlineUsers.find(curr => curr.userId === messagesData.ReceiverId) ? "Online" : "Offline"
+                                            showMoreOptions &&
+                                            <div className={`flex absolute top-[52px] right-[-40px] bg-secondary text-sm  flex-col z-50 text-center`}>
+                                                <p className='border-b-2 border-black-400 pb-1 cursor-pointer hover:bg-[#e8ebf7] p-3' onClick={() => clearChat()}>
+                                                    Clear Chat
+                                                </p>
+                                                <p className='border-b-2 border-black-400 pb-1 cursor-pointer w-full hover:bg-[#e8ebf7] p-3' onClick={() => delteConversation()}>
+                                                    Delete Conversation
+                                                </p>
+                                            </div>
                                         }
-                                    </p>
+                                    </div>
                                 </div>
 
                             </div>
-                            <div className=' h-[75vh] vh70 w-full overflow-y-scroll style-scrollbar border border-bottom-black message-container'>
+                            <div className=' h-[75vh] vh70 w-full overflow-y-scroll style-scrollbar border border-bottom-black message-container' onClick={() => setShowMoreOptions(false)}>
                                 {
                                     messagesData.messages.length > 0 ? (
 
@@ -390,7 +449,7 @@ const Dashboard = () => {
                                     )
                                 }
                             </div>
-                            <div className="w-full px-4 flex  gap-1">
+                            <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
                                 <Input placeholder='Type Your Message...' name='text' type='text' className='shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage' value={messageToBeSend}
                                     onChange={(e) => {
                                         setMessageToBeSend(e.target.value)

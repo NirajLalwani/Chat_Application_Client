@@ -13,6 +13,7 @@ const Form = ({
     const navigate = useNavigate();
 
     const { isLoggedIn, AuthorizeUser } = useUserContext()
+    const [isLoading, setIsLoading] = useState(false)
 
     const [data, setData] = useState({
         ...(!isSignInPage && {
@@ -57,6 +58,7 @@ const Form = ({
     }
 
     const HandleSubmit = async (e) => {
+        setIsLoading(true)
         const isValidData = validateData();
         if (data.image !== '') {
 
@@ -83,6 +85,7 @@ const Form = ({
                     })
                 })
                 const responseData = await response.json();
+                setIsLoading(false)
                 if (response.status === 200) {
                     toast.success(responseData.message)
                     navigate('/users/sign_in')
@@ -98,6 +101,7 @@ const Form = ({
                     body: JSON.stringify(data)
                 })
                 const responseData = await response.json();
+                setIsLoading(false)
                 if (response.status === 200) {
                     toast.success(responseData.message)
                 } else {
@@ -116,7 +120,7 @@ const Form = ({
 
     return (
         <>
-            <div className='bg-white w-[400px]  shadow-xl border rounded-lg flex flex-col justify-center items-center py-6  px-8 center box-content formWidth' >
+            <div className={`bg-white w-[400px]  shadow-xl border rounded-lg flex flex-col justify-center items-center py-6  px-8 center box-content formWidth `} >
                 <div className='text-3xl font-extrabold'>
                     Welcome {isSignInPage && "Back"}
                 </div>
@@ -172,8 +176,8 @@ const Form = ({
 
 
 
-                    <div onClick={(e) => HandleSubmit()} >
-                        <Button label={isSignInPage ? "Sign in" : "Sign up"} className='mt-3 mb-2' />
+                    <div onClick={(e) => HandleSubmit()}>
+                        <Button label={isSignInPage ? "Sign in" : "Sign up"} className={`mt-3 mb-2 ${isLoading && 'loading'}`} />
                     </div>
                     <div >
                         {isSignInPage ? "Don't" : "Already"} have an account ? <Link

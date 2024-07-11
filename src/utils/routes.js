@@ -14,3 +14,6 @@ export const SetStatusRoute = `${defaultRoute}/setoffline`
 
 export const GetUserDataRoute = `${defaultRoute}/user`;
 export const GetAllUsersDataRoute = `${defaultRoute}/users`;
+
+
+export const ClearChatRoute = `${defaultRoute}/clearChat`
