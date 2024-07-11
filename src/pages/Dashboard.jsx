@@ -86,12 +86,6 @@ const Dashboard = () => {
             ));
         });
 
-        socket.on('getClearedChat', (data) => {
-            setMessagesData({
-                ...messagesData,
-                messages: data.messages
-            })
-        })
     }, [socket])
 
 
@@ -275,10 +269,10 @@ const Dashboard = () => {
                 "receiverId": messagesData.ReceiverId
             })
         })
-        if (res.ok) {
-            socket.emit('clearChat', { 'senderId': userData.userId, 'receiverId': messagesData.ReceiverId })
-            const resData = await res.json();
-        }
+        // if (res.ok) {
+        //     socket.emit('clearChat', { 'senderId': userData.userId, 'receiverId': messagesData.ReceiverId })
+        //     const resData = await res.json();
+        // }
         console.log(resData);
     }
 

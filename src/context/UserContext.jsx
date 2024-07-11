@@ -70,7 +70,7 @@ const UserContextProvider = ({ children }) => {
 
         setFilterConversation(filteredUsers);
 
-    }, [userConversation.length])
+    }, [userConversation])
 
 
     useEffect(() => {
