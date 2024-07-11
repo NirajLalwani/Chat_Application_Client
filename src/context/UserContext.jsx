@@ -31,6 +31,7 @@ const UserContextProvider = ({ children }) => {
         }
     }
 
+
     //?Getting all userData
     const fetchAllUsers = async () => {         //?Called when user is valid
         const response = await fetch(GetAllUsersDataRoute);
@@ -58,7 +59,7 @@ const UserContextProvider = ({ children }) => {
 
     //?filterUsers is displyed on Add new user if new userConversation is added then again filter users  
     const [filterUsers, setFilterConversation] = useState([])
-    useEffect(() => {
+    const filter = () => {
         const filteredUsers = users.filter((user) => {                              //?users var conisists of all users
             const hasConversation = userConversation.some((conversation) => {      //?Finding current user in userConversation if it exists don't return it
                 return user._id === conversation.userId;
@@ -69,7 +70,9 @@ const UserContextProvider = ({ children }) => {
         });
 
         setFilterConversation(filteredUsers);
-
+    }
+    useEffect(() => {
+        filter();
     }, [userConversation])
 
 

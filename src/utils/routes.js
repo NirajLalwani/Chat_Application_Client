@@ -17,3 +17,4 @@ export const GetAllUsersDataRoute = `${defaultRoute}/users`;
 
 
 export const ClearChatRoute = `${defaultRoute}/clearChat`
+export const DeleteChatRoute = `${defaultRoute}/delteConversation`
