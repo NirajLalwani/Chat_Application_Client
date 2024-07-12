@@ -88,7 +88,7 @@ const UserContextProvider = ({ children }) => {
 
     return (
         <>
-            <Context.Provider value={{ isLoggedIn, AuthorizeUser, userData, userConversation, users, messagesData, setMessagesData, filterUsers, setIsLoggedIn, setUserConversations }}>
+            <Context.Provider value={{ isLoggedIn, AuthorizeUser, userData, userConversation, users, messagesData, setMessagesData, filterUsers, setIsLoggedIn, setUserConversations, filter }}>
                 {children}
             </Context.Provider >
         </>

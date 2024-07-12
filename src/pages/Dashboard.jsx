@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Input from '../components/Input'
+import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useUserContext } from '../context/UserContext'
-import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute } from '../utils/routes'
+import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute } from '../utils/routes'
 import { io } from 'socket.io-client'
 
 import { LuSend } from "react-icons/lu";
@@ -12,7 +13,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 const Dashboard = () => {
 
-    const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations } = useUserContext();
+    const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter } = useUserContext();
     const navigate = useNavigate();
 
 
@@ -40,10 +41,19 @@ const Dashboard = () => {
     //&Current Message
     const [messageToBeSend, setMessageToBeSend] = useState("");
 
+    //&DoubleClickMessageDeleteCopy
+    const [showDoubleClickPopUp, setShowDoubleClickPopUp] = useState(false)
+    const [messageDetails, setMessageDetails] = useState({
+        senderId: "",
+        receiverId: "",
+        messageId: "",
+        message: ""
+    })
+
     //******************************************************************************************************************************  */
     //&Socket Io
     // const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
-    const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
+    const [socket, setSocket] = useState(io("http://localhost:8000"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
     //?For addUser and getUser in socket
@@ -61,7 +71,7 @@ const Dashboard = () => {
     }, [socket, userData.userId])
 
 
-    //?For getting Messages
+    //?For getting Messages/getConversation/clearChat
     useEffect(() => {
         socket.on('getMessage', (data) => {
 
@@ -91,6 +101,14 @@ const Dashboard = () => {
                 messages: []
             }))
         })
+        socket.on('getMessagessAfterDeleting', (data) => {
+            setMessagesData(prev => ({
+                ...prev,
+                messages: data
+            }))
+        })
+
+
     }, [socket])
 
 
@@ -128,6 +146,7 @@ const Dashboard = () => {
                 conversationId: ""
             })
             setConversationOpen(false)
+            filter();
         })
 
     }, [socket, userConversation])
@@ -147,9 +166,6 @@ const Dashboard = () => {
         scrollToBottom();
     }, [messagesData])
 
-    useEffect(() => {
-
-    }, [userConversation])
 
 
     const fetchMessages = async (ConversationId, Name, Img, Id, Email) => {
@@ -164,7 +180,6 @@ const Dashboard = () => {
             conversationId: ConversationId,
             ReceiverEmail: Email
         })
-        console.log("Fetch Messaage Called")
     }
 
     const CreateConversation = async () => {
@@ -230,16 +245,6 @@ const Dashboard = () => {
             let time = `${hours}:${minutes}`
             let Fulldate = `${date}/${month}/${year}`
 
-            socket.emit('sendMessage', {
-                senderId: userData.userId,
-                receiverId: messagesData.ReceiverId,
-                message: messageToBeSend,
-                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
-                time,
-                date: Fulldate
-            })
-
-
 
             const response = await fetch(`${SendMessageRoute}`, {
                 method: "POST",
@@ -255,6 +260,17 @@ const Dashboard = () => {
                 })
             })
             const resData = await response.json();
+            socket.emit('sendMessage', {
+                senderId: userData.userId,
+                receiverId: messagesData.ReceiverId,
+                message: messageToBeSend,
+                conversationId: NewConversationId ? NewConversationId : messagesData.conversationId,
+                time,
+                date: Fulldate,
+                _id: resData._id
+            })
+
+            console.log(resData, "This is ResData");
 
             setMessageToBeSend('');
 
@@ -272,6 +288,25 @@ const Dashboard = () => {
             }
 
 
+        }
+    }
+
+
+    const deleteMessage = async () => {
+        const response = await fetch(DeleteMessageRoute, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": 'application/json'
+            },
+            body: JSON.stringify({
+                messageId: messageDetails.messageId
+            })
+        })
+
+        if (response.ok) {
+            const data = await response.json();
+            socket.emit('getMessagesAfterDelete', { senderId: userData.userId, receiverId: messagesData.ReceiverId, conversationId: messagesData.conversationId })
+            setShowDoubleClickPopUp(false);
         }
     }
 
@@ -319,10 +354,14 @@ const Dashboard = () => {
                         <div className='ml-3'>
                             <h3 className='text-xl font-semibold accountName'>{userData.fullName}</h3>
                             <p className='text-sm font-light'>My Account <span className='text-primary underline text-sm cursor-pointer' onClick={() => {
-                                socket.emit('removeUser', userData.userId)
-                                localStorage.removeItem('token')
-                                setIsLoggedIn(false)
-                                navigate('users/sign_in')
+                                let confirmation = confirm("Are you sure to logout");
+                                if (confirmation) {
+
+                                    socket.emit('removeUser', userData.userId)
+                                    localStorage.removeItem('token')
+                                    setIsLoggedIn(false)
+                                    navigate('users/sign_in')
+                                }
 
                             }}>Logout</span> </p>
                         </div>
@@ -381,7 +420,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className={`w-[50%] h-screen  bg-white flex flex-col items-center chat-section ${conversationOpen && 'openConversation'}`}>
+                <div className={`w-[50%] h-screen  bg-white flex flex-col items-center chat-section relative ${conversationOpen && 'openConversation'}`}>
                     {
 
                         messagesData.ReceiverName ?
@@ -430,7 +469,7 @@ const Dashboard = () => {
                                             <div className='px-8 py-10 flex flex-col gap-5'>
 
                                                 {
-                                                    messagesData.messages.map(({ senderId, message, time, date }, index) => (
+                                                    messagesData.messages.map(({ senderId, message, time, date, _id }, index) => (
                                                         <>
                                                             {
                                                                 (index === 0) ? (
@@ -442,7 +481,7 @@ const Dashboard = () => {
                                                                     </div>
                                                                 ) : (
 
-                                                                    (date !== messagesData.messages[index - 1].date) && <div key={index} className='px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
+                                                                    (date !== messagesData.messages[index - 1].date) && <div key={index} className='select-none px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
                                                                         style={{ wordWrap: 'break-word' }}
                                                                     >
                                                                         {date}
@@ -453,26 +492,54 @@ const Dashboard = () => {
 
                                                             {
 
-                                                                (senderId == userData.userId) ? (
-                                                                    <div className='p-3 py-1 max-w-[52%] border bg-primary rounded-b-lg rounded-tl-lg text-sm ml-auto text-white pr-11 message'
-                                                                        style={{ wordWrap: 'break-word' }}
-                                                                    >
-                                                                        {message}
-                                                                        <span className='message-time message-time-sender text-white'>{time}</span>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className='p-3 py-1  max-w-[52%]  bg-secondary rounded-b-lg rounded-tr-lg text-sm mr-auto pr-11 message'
-                                                                        style={{ wordWrap: 'break-word' }}
-                                                                    >
-                                                                        {message}
-                                                                        <span className='message-time message-time-receiver'>{time}</span>
-                                                                    </div>
-                                                                )
+                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? "border  bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : "bg-secondary rounded-b-lg rounded-tr-lg  mr-auto"}`}
+                                                                    style={{ wordWrap: 'break-word' }}
+                                                                    onDoubleClick={(e) => {
+                                                                        setMessageDetails({
+                                                                            senderId: userData.userId,
+                                                                            receiverId: messagesData.ReceiverId,
+                                                                            message: message,
+                                                                            messageId: _id
+                                                                        })
+                                                                        setShowDoubleClickPopUp(true)
+                                                                    }}
+                                                                >
+                                                                    {message}
+                                                                    <span className={`message-time ${senderId == userData.userId && 'text-white'}`}>{time}</span>
+                                                                </div>
+
                                                             }
 
                                                         </>
                                                     )
                                                     )
+                                                }
+
+                                                {
+                                                    showDoubleClickPopUp &&
+                                                    <div className='absolute h-[100%] w-[100%] bg-[#00000022] top-0 left-0'>
+                                                        <div className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white text-black shadow-md px-9 py-7 rounded-lg flex flex-col gap-4'>
+                                                            <div className='text-center relative w-full'>
+                                                                <p className='w-full'>{messageDetails.message}</p>
+                                                                <div className='absolute top-[-15px] right-[-15px] text-black hover:bg-[#0000003e] hover:text-white rounded-full text-xl p-1 cursor-pointer' onClick={() => setShowDoubleClickPopUp(false)}>
+                                                                    <IoMdClose />
+                                                                </div>
+                                                            </div>
+                                                            <div className='flex gap-4'>
+                                                                <button className='bg-red-500 text-white text-sm px-2 w-32 py-1 cursor-pointer hover:bg-red-400'
+                                                                    onClick={() => deleteMessage()}
+                                                                >Delete Message</button>
+                                                                <button className='bg-blue-500 text-white text-sm px-2 w-32 py-1 cursor-pointer hover:bg-blue-400'
+                                                                    onClick={async (e) => {
+                                                                        setShowDoubleClickPopUp(false)
+                                                                        await navigator.clipboard.writeText(messageDetails.message);
+                                                                        e.target.innerText = 'Copied!';
+                                                                        toast("Message Copied!")
+                                                                    }}
+                                                                >Copy Message</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 }
 
                                             </div>
@@ -571,6 +638,18 @@ const Dashboard = () => {
                 }
 
             </div >
+            <ToastContainer
+                position="top-right"
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+            <ToastContainer />
         </>
     )
 }
