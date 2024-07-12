@@ -1,5 +1,5 @@
-export const defaultRoute = 'http://localhost:8000/api'
-// export const defaultRoute = 'https://chat-application-backend-8jfk.onrender.com/api'
+// export const defaultRoute = 'http://localhost:8000/api'
+export const defaultRoute = 'https://chat-application-backend-8jfk.onrender.com/api'
 
 export const registerRoute = `${defaultRoute}/register`;
 export const loginRoute = `${defaultRoute}/login`;

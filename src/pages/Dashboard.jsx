@@ -53,7 +53,7 @@ const Dashboard = () => {
     //******************************************************************************************************************************  */
     //&Socket Io
     // const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
-    const [socket, setSocket] = useState(io("http://localhost:8000"));
+    const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
     //?For addUser and getUser in socket
