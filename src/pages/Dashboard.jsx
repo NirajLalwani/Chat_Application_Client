@@ -33,7 +33,7 @@ if (!userData || !userConversation) {
     //&User Details Pop up
     const [popUp, setPopUp] = useState(false)
 
-    //&For Responsive Design
+    //&For Responsive Design      
     const [addNewFriends, setAddNewFriends] = useState(false)
     const [conversationOpen, setConversationOpen] = useState(false)
 
