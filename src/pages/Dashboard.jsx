@@ -16,24 +16,24 @@ const Dashboard = () => {
     const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter } = useUserContext();
     const navigate = useNavigate();
 
-}
-
-if (!userData || !userConversation) {
-    return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
-
+    if (userData || !userConversation) {
+        return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
+    }
 
     useEffect(() => {
         if (!isLoggedIn) {
             navigate('users/sign_in');  //?Navigting to signin page
         }
     }, [isLoggedIn])
+
+
     //&Message section more options
     const [showMoreOptions, setShowMoreOptions] = useState(false)
 
     //&User Details Pop up
     const [popUp, setPopUp] = useState(false)
 
-    //&For Responsive Design      
+    //&For Responsive Design
     const [addNewFriends, setAddNewFriends] = useState(false)
     const [conversationOpen, setConversationOpen] = useState(false)
 
