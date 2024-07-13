@@ -485,7 +485,7 @@ const Dashboard = () => {
                                                                     </div>
                                                                 ) : (
 
-                                                                    (date !== messagesData.messages[index - 1].date) && <div key={index} className='select-none px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
+                                                                    (date !== messagesData.messages[index - 1].date) && <div key={index} className='no-select px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
                                                                         style={{ wordWrap: 'break-word' }}
                                                                     >
                                                                         {date}
