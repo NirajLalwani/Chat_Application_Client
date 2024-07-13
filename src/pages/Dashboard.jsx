@@ -261,8 +261,7 @@ const Dashboard = () => {
                     date: Fulldate
                 })
             })
-            console.log(response)
-            const resData = await response.json();
+
             socket.emit('sendMessage', {
                 senderId: userData.userId,
                 receiverId: messagesData.ReceiverId,
@@ -273,7 +272,7 @@ const Dashboard = () => {
                 _id: resData._id
             })
 
-            console.log(resData, "This is ResData");
+            const resData = await response.json();
 
             setMessageToBeSend('');
 
