@@ -6,7 +6,7 @@ const UserContextProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(true)
     const [userConversation, setUserConversations] = useState([]);
     const [users, setUsers] = useState([])
-    const [userData, setUserData] = useState(false);
+    const [userData, setUserData] = useState(null);
 
     //?It consits data of receiver along with sender and receiver conversation id
     const [messagesData, setMessagesData] = useState({
