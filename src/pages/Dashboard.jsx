@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
+
 import Input from '../components/Input'
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useUserContext } from '../context/UserContext'
-import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute } from '../utils/routes'
+import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute, DeleteAccoutRoute } from '../utils/routes'
 import { io } from 'socket.io-client'
 
 import { LuSend } from "react-icons/lu";
@@ -11,6 +12,8 @@ import { HiUserAdd } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io";
 import { IoMdArrowBack } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { IoMdSettings } from "react-icons/io";
+import { MdOutlineLogout } from "react-icons/md";
 const Dashboard = () => {
 
     const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter } = useUserContext();
@@ -32,6 +35,9 @@ const Dashboard = () => {
 
     //&User Details Pop up
     const [popUp, setPopUp] = useState(false)
+
+    //&For Settings
+    const [showSettings, setShowSettings] = useState(false)
 
     //&For Responsive Design
     const [addNewFriends, setAddNewFriends] = useState(false)
@@ -347,27 +353,76 @@ const Dashboard = () => {
         }
     }
 
+
     return (
         <>
 
             <div className='w-screen flex'>
-                <div className='w-[25%] h-screen  bg-secondary conversation-section'>
+                <div className='w-[25%] h-screen  bg-secondary conversation-section relative'>
                     <div className='flex justify-center items-center my-5 h-[15vh] profile-section'>
                         <img src={userData.image} alt="" className='rounded-full profileImage border-primary border-2' />
                         <div className='ml-3'>
                             <h3 className='text-xl font-semibold accountName'>{userData.fullName}</h3>
-                            <p className='text-sm font-light'>My Account <span className='text-primary underline text-sm cursor-pointer' onClick={() => {
-                                let confirmation = confirm("Are you sure to logout");
-                                if (confirmation) {
 
-                                    socket.emit('removeUser', userData.userId)
-                                    localStorage.removeItem('token')
-                                    setIsLoggedIn(false)
-                                    navigate('users/sign_in')
-                                }
-
-                            }}>Logout</span> </p>
+                            <div className='text-lg text-gray-500 flex gap-1 items-center cursor-pointer'
+                                onClick={() => setShowSettings(true)}
+                            >
+                                <p>
+                                    Settings
+                                </p>
+                                <IoMdSettings className='' />
+                            </div>
                         </div>
+
+                        {
+                            showSettings &&
+                            <div className='absolute top-0 left-0 bg-white w-full py-5 px-3 shadow-lg'>
+                                <figure className='w-full relative'>
+                                    <img src={userData.image} alt="" className='w-[150px] h-[150px] rounded-full mx-auto' />
+                                    <IoMdClose className='absolute top-0 right-5 cursor-pointer' onClick={() => setShowSettings(false)} />
+                                </figure>
+                                <div className='flex flex-col px-2 my-3'>
+                                    <h2 className='text-sm  border-b-2 py-1'>Name:- <span className='font-bold'> {userData.fullName} </span></h2>
+                                    <p className='text-sm  border-b-2 py-1'>Email:- <span className='font-bold'> {userData.email} </span></p>
+                                    <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
+                                        onClick={
+                                            () => {
+                                                let confirmation = confirm("Are you sure to logout?");
+                                                if (confirmation) {
+
+                                                    socket.emit('removeUser', userData.userId)
+                                                    localStorage.removeItem('token')
+                                                    setIsLoggedIn(false)
+                                                    navigate('users/sign_in')
+                                                }
+                                            }
+                                        }
+                                    >Logout <MdOutlineLogout /> </p>
+                                    <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
+                                        onClick={
+                                            async () => {
+                                                let confirmation = confirm("Are you sure to Delete Account");
+                                                if (confirmation) {
+                                                    const res = await fetch(DeleteAccoutRoute, {
+                                                        method: "DELETE",
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({ _id: userData.userId })
+                                                    })
+                                                    if (res.ok) {
+                                                        socket.emit('removeUser', userData.userId)
+                                                        localStorage.removeItem('token')
+                                                        setIsLoggedIn(false)
+                                                        navigate('users/sign_in')
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    >Delete Account </p>
+                                </div>
+                            </div>
+                        }
                     </div>
                     <hr />
                     <div className='pt-5 shadow-inner'>
@@ -429,7 +484,7 @@ const Dashboard = () => {
                         messagesData.ReceiverName ?
                             <>
                                 <div className='w-[80%] px-8 bg-secondary h-[60px] mt-6 rounded-full flex justify-start items-center gap-3 p-9 mb-3'>
-                                    <IoMdArrowBack className='text-xl cursor-pointer' onClick={() => { setConversationOpen(false) }} />
+                                    <IoMdArrowBack className='text-xl cursor-pointer arrow' onClick={() => { setConversationOpen(false) }} />
                                     <figure className='w-[80px]'>
                                         <img src={messagesData.ReciverImage} alt="" className='conversationImage rounded-full  border-primary border-2 cursor-pointer' onClick={() => {
                                             setPopUp(true)
@@ -464,7 +519,7 @@ const Dashboard = () => {
                                     </div>
 
                                 </div>
-                                <div className=' h-[75vh] vh70 w-full overflow-y-scroll style-scrollbar border border-bottom-black message-container' onClick={() => setShowMoreOptions(false)}>
+                                <div className=' h-[75vh] vh70 w-full overflow-y-scroll style-scrollbar  message-container' onClick={() => setShowMoreOptions(false)}>
                                     {
                                         messagesData.messages.length > 0 ? (
 
@@ -495,7 +550,7 @@ const Dashboard = () => {
 
                                                             {
 
-                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? "border  bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : "bg-secondary rounded-b-lg rounded-tr-lg  mr-auto"}`}
+                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? " bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : "bg-secondary rounded-b-lg rounded-tr-lg  mr-auto"}`}
                                                                     style={{ wordWrap: 'break-word' }}
                                                                     onDoubleClick={(e) => {
                                                                         setMessageDetails({

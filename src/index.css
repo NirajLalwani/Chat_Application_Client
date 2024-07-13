@@ -26,14 +26,14 @@
     }
 
     .style-scrollbar::-webkit-scrollbar-track {
-        background-color: #f1f1f1;
+        background-color: transparent;
         /* Color of the track */
         border-radius: 5px;
         /* Radius of the track */
     }
 
     .style-scrollbar::-webkit-scrollbar-thumb {
-        background-color: #888;
+        background-color: #e8e3e3;
         /* Color of the thumb */
         border-radius: 5px;
         /* Radius of the thumb */
@@ -49,6 +49,10 @@
         -ms-transform: translate(-50%, -50%);
         -o-transform: translate(-50%, -50%);
     }
+}
+
+.arrow {
+    display: none;
 }
 
 .loading {
@@ -100,6 +104,14 @@
         -ms-transform: rotate(360deg);
         -o-transform: rotate(360deg);
     }
+}
+
+.chat-section {
+    background-color: transparent !important;
+    background-image: url("https://images.pexels.com/photos/19670/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 
@@ -209,6 +221,11 @@
 }
 
 @media (max-width: 700px) {
+
+
+    .arrow {
+        display: block;
+    }
 
     .conversation-section,
     .chat-section,
