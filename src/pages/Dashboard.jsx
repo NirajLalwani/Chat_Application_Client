@@ -47,13 +47,14 @@ const Dashboard = () => {
         senderId: "",
         receiverId: "",
         messageId: "",
-        message: ""
+        message: "",
+        showDelete: false
     })
 
     //******************************************************************************************************************************  */
     //&Socket Io
     // const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
-    const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
+    const [socket, setSocket] = useState(io("http://localhost:8000"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
     //?For addUser and getUser in socket
@@ -68,7 +69,7 @@ const Dashboard = () => {
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
-    }, [socket, userData.userId])
+    }, [socket, userData])
 
 
     //?For getting Messages/getConversation/clearChat
@@ -121,6 +122,7 @@ const Dashboard = () => {
                     return curr.ConversationId === data.conversationId;
                 })
                 if (index !== -1) {
+                    console.log("CALLED");
                     if (data.ClearChat == true) {
                         allConversation[index].latestMessage = ""
                     } else {
@@ -259,6 +261,7 @@ const Dashboard = () => {
                     date: Fulldate
                 })
             })
+            console.log(response)
             const resData = await response.json();
             socket.emit('sendMessage', {
                 senderId: userData.userId,
@@ -304,6 +307,7 @@ const Dashboard = () => {
         })
 
         if (response.ok) {
+
             const data = await response.json();
             socket.emit('getMessagesAfterDelete', { senderId: userData.userId, receiverId: messagesData.ReceiverId, conversationId: messagesData.conversationId })
             setShowDoubleClickPopUp(false);
@@ -499,7 +503,8 @@ const Dashboard = () => {
                                                                             senderId: userData.userId,
                                                                             receiverId: messagesData.ReceiverId,
                                                                             message: message,
-                                                                            messageId: _id
+                                                                            messageId: _id,
+                                                                            showDelete: senderId == userData.userId ? true : false
                                                                         })
                                                                         setShowDoubleClickPopUp(true)
                                                                     }}
@@ -526,9 +531,11 @@ const Dashboard = () => {
                                                                 </div>
                                                             </div>
                                                             <div className='flex gap-4'>
-                                                                <button className='bg-red-500 text-white text-sm px-2 w-32 py-1 cursor-pointer hover:bg-red-400'
-                                                                    onClick={() => deleteMessage()}
-                                                                >Delete Message</button>
+                                                                {messageDetails.showDelete &&
+                                                                    <button className='bg-red-500 text-white text-sm px-2 w-32 py-1 cursor-pointer hover:bg-red-400'
+                                                                        onClick={() => deleteMessage()}
+                                                                    >Delete Message</button>
+                                                                }
                                                                 <button className='bg-blue-500 text-white text-sm px-2 w-32 py-1 cursor-pointer hover:bg-blue-400'
                                                                     onClick={async (e) => {
                                                                         setShowDoubleClickPopUp(false)
