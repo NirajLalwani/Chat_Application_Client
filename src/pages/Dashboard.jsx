@@ -558,7 +558,7 @@ const Dashboard = () => {
                                     }
                                 </div>
                                 <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
-                                    <Input placeholder='Type Your Message...' name='text' type='text' className='shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage' value={messageToBeSend}
+                                    <Input placeholder='Type Your Message...' name='text' type='text' className='cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage' value={messageToBeSend}
                                         onChange={(e) => {
                                             setMessageToBeSend(e.target.value)
                                         }}
