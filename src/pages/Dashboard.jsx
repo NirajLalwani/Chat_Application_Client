@@ -18,15 +18,15 @@ const Dashboard = () => {
 
 }
 
-useEffect(() => {
-    if (!isLoggedIn) {
-        navigate('users/sign_in');  //?Navigting to signin page
-    }
-}, [isLoggedIn])
-
 if (!userData || !userConversation) {
     return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
 
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            navigate('users/sign_in');  //?Navigting to signin page
+        }
+    }, [isLoggedIn])
     //&Message section more options
     const [showMoreOptions, setShowMoreOptions] = useState(false)
 
