@@ -16,16 +16,16 @@ const Dashboard = () => {
     const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter } = useUserContext();
     const navigate = useNavigate();
 
-    if (!userData || !userConversation) {
-        return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
+}
+
+useEffect(() => {
+    if (!isLoggedIn) {
+        navigate('users/sign_in');  //?Navigting to signin page
     }
+}, [isLoggedIn])
 
-    useEffect(() => {
-        if (!isLoggedIn) {
-            navigate('users/sign_in');  //?Navigting to signin page
-        }
-    }, [isLoggedIn])
-
+if (!userData || !userConversation) {
+    return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
 
     //&Message section more options
     const [showMoreOptions, setShowMoreOptions] = useState(false)
