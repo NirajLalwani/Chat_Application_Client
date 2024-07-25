@@ -377,7 +377,7 @@ const Dashboard = () => {
                         </div>
 
                         {/* SHow Setting POP UP ------------------------------------------------------------------------------------------- */}
-                        <div className={`absolute top-[-100%] left-0 bg-white w-full py-5 px-3 shadow-lg transition ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"}`} style={{
+                        <div className={`absolute top-[-100%] left-0 w-full py-5 px-3 shadow-lg transition ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-white"}`} style={{
                             top: `${showSettings ? '0' : '-100%'}`,
                             transition: '.5s linear'
                         }}>
@@ -600,7 +600,7 @@ const Dashboard = () => {
                                                 {
                                                     showDoubleClickPopUp &&
                                                     <div className={`absolute h-[100%] w-[100%] bg-[#00000022] top-0 left-0`}>
-                                                        <div className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white text-black shadow-md px-9 py-7 rounded-lg flex flex-col gap-4 ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"} `}>
+                                                        <div className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]  text-black shadow-md px-9 py-7 rounded-lg flex flex-col gap-4 ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-white"} `}>
                                                             <div className='text-center relative w-full'>
                                                                 <p className={`w-full ${userData.theme === "dark" && "text-white"} `}>{messageDetails.message}</p>
                                                                 <div className={`absolute top-[-15px] right-[-15px] text-black hover:bg-[#0000003e] hover:text-white rounded-full text-xl p-1 cursor-pointer ${userData.theme === "dark" && "text-white"}`} onClick={() => setShowDoubleClickPopUp(false)}>
@@ -636,7 +636,7 @@ const Dashboard = () => {
                                     }
                                 </div>
                                 <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
-                                    <Input placeholder='Type Your Message...' name='text' type='text' className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"}`} value={messageToBeSend}
+                                    <Input placeholder='Type Your Message...' name='text' type='text' className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`} value={messageToBeSend}
                                         onChange={(e) => {
                                             setMessageToBeSend(e.target.value)
                                         }}
@@ -708,7 +708,7 @@ const Dashboard = () => {
                 {
                     popUp && <div className={` h-[100vh] w-[100vw] bg-[#00000074] absolute top-0 left-0 popupDetails`}>
 
-                        <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "bg-[#282C35] text-white shadow-black" : "bg-secondary"}`}>
+                        <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "bg-[#282C35]  shadow-black" : "bg-white"}`}>
                             <figure className='rounded-full flex justify-center items-center'>
                                 <img src={messagesData.ReciverImage} alt="Image" className='rounded-full popupImage' />
                             </figure>
