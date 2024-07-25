@@ -658,7 +658,7 @@ const Dashboard = () => {
                     }
                 </div>
 
-                <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "!bg-[#282C35]" : "bg-secondary"} bg-secondary addNewUserSection ${addNewFriends && "openNewFriends"}`}>
+                <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "!bg-[#282C35]" : "bg-secondary"} addNewUserSection ${addNewFriends && "openNewFriends"}`}>
                     <div>
                         <div className='flex'>
                             <p className='text-primary px-6 py-8 text-xl'>Other Users</p>
