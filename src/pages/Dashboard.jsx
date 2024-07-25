@@ -555,7 +555,7 @@ const Dashboard = () => {
                                                             {
                                                                 (index === 0) ? (
 
-                                                                    <div className={`px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary ${userData.theme === "dark" ? "bg-[#282C35] text-white border-none" : "bg-secondary"} `}
+                                                                    <div className={`px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary ${userData.theme === "dark" ? "!bg-[#282C35] !text-white !border-none" : "bg-secondary"} `}
                                                                         style={{ wordWrap: 'break-word' }}
                                                                     >
                                                                         {date}
