@@ -4,7 +4,7 @@ import Input from '../components/Input'
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useUserContext } from '../context/UserContext'
-import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute, DeleteAccoutRoute } from '../utils/routes'
+import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute, DeleteAccoutRoute, UpdateThemeRoute } from '../utils/routes'
 import { io } from 'socket.io-client'
 
 import { LuSend } from "react-icons/lu";
@@ -16,7 +16,7 @@ import { IoMdSettings } from "react-icons/io";
 import { MdOutlineLogout } from "react-icons/md";
 const Dashboard = () => {
 
-    const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter } = useUserContext();
+    const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter, setUserData } = useUserContext();
     const navigate = useNavigate();
 
 
@@ -357,8 +357,10 @@ const Dashboard = () => {
     return (
         <>
 
-            <div className='w-screen flex'>
-                <div className='w-[25%] h-screen  bg-secondary conversation-section relative'>
+            <div className='w-screen flex' style={{
+                color: userData.theme === 'dark' && "white"
+            }}>
+                <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"}  conversation-section relative`}>
                     <div className='flex justify-center items-center my-5 h-[15vh] profile-section'>
                         <img src={userData.image} alt="" className='rounded-full profileImage border-primary border-2' />
                         <div className='ml-3'>
@@ -374,22 +376,65 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        {
-                            showSettings &&
-                            <div className='absolute top-0 left-0 bg-white w-full py-5 px-3 shadow-lg'>
-                                <figure className='w-full relative'>
-                                    <img src={userData.image} alt="" className='w-[150px] h-[150px] rounded-full mx-auto' />
-                                    <IoMdClose className='absolute top-0 right-5 cursor-pointer' onClick={() => setShowSettings(false)} />
-                                </figure>
-                                <div className='flex flex-col px-2 my-3'>
-                                    <h2 className='text-sm  border-b-2 py-1'>Name:- <span className='font-bold'> {userData.fullName} </span></h2>
-                                    <p className='text-sm  border-b-2 py-1'>Email:- <span className='font-bold'> {userData.email} </span></p>
-                                    <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
-                                        onClick={
-                                            () => {
-                                                let confirmation = confirm("Are you sure to logout?");
-                                                if (confirmation) {
+                        {/* SHow Setting POP UP ------------------------------------------------------------------------------------------- */}
+                        <div className={`absolute top-[-100%] left-0 bg-white w-full py-5 px-3 shadow-lg transition ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"}`} style={{
+                            top: `${showSettings ? '0' : '-100%'}`,
+                            transition: '.5s linear'
+                        }}>
+                            <figure className='w-full relative'>
+                                <img src={userData.image} alt="" className='w-[150px] h-[150px] rounded-full mx-auto' />
+                                <IoMdClose className='absolute top-0 right-5 cursor-pointer' onClick={() => setShowSettings(false)} />
+                            </figure>
+                            <div className='flex flex-col px-2 my-3'>
+                                <h2 className='text-sm  border-b-2 py-1'>Name:- <span className='font-bold'> {userData.fullName} </span></h2>
+                                <p className='text-sm  border-b-2 py-1'>Email:- <span className='font-bold'> {userData.email} </span></p>
+                                <div className='flex gap-3 border-b-2 py-1 text-sm items-center'>
+                                    <p>Theme:- </p>
+                                    <select value={userData.theme} className='px-2 py-1 rounded-sm border border-slate-600 bg-transparent cursor-pointer' onChange={async () => {
+                                        await fetch(UpdateThemeRoute, {
+                                            method: "PATCH",
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({ _id: userData.userId })
+                                        })
+                                        setUserData({
+                                            ...userData,
+                                            theme: userData.theme === 'dark' ? 'light' : 'dark'
+                                        })
 
+                                    }}>
+                                        <option className={`cursor-pointer ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"} p-0 m-0`} value="light">Light</option>
+                                        <option className={`cursor-pointer ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"} p-0 m-0`} value="dark">Dark</option>
+                                    </select>
+                                </div>
+                                <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
+                                    onClick={
+                                        () => {
+                                            let confirmation = confirm("Are you sure to logout?");
+                                            if (confirmation) {
+
+                                                socket.emit('removeUser', userData.userId)
+                                                localStorage.removeItem('token')
+                                                setIsLoggedIn(false)
+                                                navigate('users/sign_in')
+                                            }
+                                        }
+                                    }
+                                >Logout <MdOutlineLogout /> </p>
+                                <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
+                                    onClick={
+                                        async () => {
+                                            let confirmation = confirm("Are you sure to Delete Account");
+                                            if (confirmation) {
+                                                const res = await fetch(DeleteAccoutRoute, {
+                                                    method: "DELETE",
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify({ _id: userData.userId })
+                                                })
+                                                if (res.ok) {
                                                     socket.emit('removeUser', userData.userId)
                                                     localStorage.removeItem('token')
                                                     setIsLoggedIn(false)
@@ -397,32 +442,11 @@ const Dashboard = () => {
                                                 }
                                             }
                                         }
-                                    >Logout <MdOutlineLogout /> </p>
-                                    <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
-                                        onClick={
-                                            async () => {
-                                                let confirmation = confirm("Are you sure to Delete Account");
-                                                if (confirmation) {
-                                                    const res = await fetch(DeleteAccoutRoute, {
-                                                        method: "DELETE",
-                                                        headers: {
-                                                            'Content-Type': 'application/json'
-                                                        },
-                                                        body: JSON.stringify({ _id: userData.userId })
-                                                    })
-                                                    if (res.ok) {
-                                                        socket.emit('removeUser', userData.userId)
-                                                        localStorage.removeItem('token')
-                                                        setIsLoggedIn(false)
-                                                        navigate('users/sign_in')
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    >Delete Account </p>
-                                </div>
+                                    }
+                                >Delete Account </p>
                             </div>
-                        }
+                        </div>
+                        {/* SHow Setting POP UP ------------------------------------------------------------------------------------------- */}
                     </div>
                     <hr />
                     <div className='pt-5 shadow-inner'>
@@ -478,12 +502,12 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className={`w-[50%] h-screen  bg-white flex flex-col items-center chat-section relative ${conversationOpen && 'openConversation'}`}>
+                <div className={`w-[50%] h-screen  ${userData.theme === "dark" ? "bg-[#343A46]" : "bg-white"} flex flex-col items-center chat-section relative ${conversationOpen && 'openConversation'}`}>
                     {
 
                         messagesData.ReceiverName ?
                             <>
-                                <div className='w-[80%] px-8 bg-secondary h-[60px] mt-6 rounded-full flex justify-start items-center gap-3 p-9 mb-3'>
+                                <div className={`w-[80%] px-8  h-[60px] mt-6 rounded-full flex justify-start items-center gap-3 p-9 mb-3 ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"} `}>
                                     <IoMdArrowBack className='text-xl cursor-pointer arrow' onClick={() => { setConversationOpen(false) }} />
                                     <figure className='w-[80px]'>
                                         <img src={messagesData.ReciverImage} alt="" className='conversationImage rounded-full  border-primary border-2 cursor-pointer' onClick={() => {
@@ -523,7 +547,6 @@ const Dashboard = () => {
                                     {
                                         messagesData.messages.length > 0 ? (
 
-
                                             <div className='px-8 py-10 flex flex-col gap-5'>
 
                                                 {
@@ -532,14 +555,14 @@ const Dashboard = () => {
                                                             {
                                                                 (index === 0) ? (
 
-                                                                    <div className='px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
+                                                                    <div className={`px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary ${userData.theme === "dark" ? "bg-[#282C35] text-white border-none" : "bg-secondary"} `}
                                                                         style={{ wordWrap: 'break-word' }}
                                                                     >
                                                                         {date}
                                                                     </div>
                                                                 ) : (
 
-                                                                    (date !== messagesData.messages[index - 1].date) && <div key={index} className='no-select px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary'
+                                                                    (date !== messagesData.messages[index - 1].date) && <div key={index} className={`no-select px-2 py-1 border rounded-lg text-sm mx-auto text-black  message ${userData.theme === "dark" ? "bg-[#282C35] text-white border-none" : "bg-secondary"} `}
                                                                         style={{ wordWrap: 'break-word' }}
                                                                     >
                                                                         {date}
@@ -550,7 +573,7 @@ const Dashboard = () => {
 
                                                             {
 
-                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? " bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : "bg-secondary rounded-b-lg rounded-tr-lg  mr-auto"}`}
+                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? " bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : `bg-secondary rounded-b-lg rounded-tr-lg  mr-auto ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"}`}`}
                                                                     style={{ wordWrap: 'break-word' }}
                                                                     onDoubleClick={(e) => {
                                                                         setMessageDetails({
@@ -576,11 +599,11 @@ const Dashboard = () => {
 
                                                 {
                                                     showDoubleClickPopUp &&
-                                                    <div className='absolute h-[100%] w-[100%] bg-[#00000022] top-0 left-0'>
-                                                        <div className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white text-black shadow-md px-9 py-7 rounded-lg flex flex-col gap-4'>
+                                                    <div className={`absolute h-[100%] w-[100%] bg-[#00000022] top-0 left-0`}>
+                                                        <div className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white text-black shadow-md px-9 py-7 rounded-lg flex flex-col gap-4 ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"} `}>
                                                             <div className='text-center relative w-full'>
-                                                                <p className='w-full'>{messageDetails.message}</p>
-                                                                <div className='absolute top-[-15px] right-[-15px] text-black hover:bg-[#0000003e] hover:text-white rounded-full text-xl p-1 cursor-pointer' onClick={() => setShowDoubleClickPopUp(false)}>
+                                                                <p className={`w-full ${userData.theme === "dark" && "text-white"} `}>{messageDetails.message}</p>
+                                                                <div className={`absolute top-[-15px] right-[-15px] text-black hover:bg-[#0000003e] hover:text-white rounded-full text-xl p-1 cursor-pointer ${userData.theme === "dark" && "text-white"}`} onClick={() => setShowDoubleClickPopUp(false)}>
                                                                     <IoMdClose />
                                                                 </div>
                                                             </div>
@@ -613,7 +636,7 @@ const Dashboard = () => {
                                     }
                                 </div>
                                 <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
-                                    <Input placeholder='Type Your Message...' name='text' type='text' className='cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage' value={messageToBeSend}
+                                    <Input placeholder='Type Your Message...' name='text' type='text' className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"}`} value={messageToBeSend}
                                         onChange={(e) => {
                                             setMessageToBeSend(e.target.value)
                                         }}
@@ -635,7 +658,7 @@ const Dashboard = () => {
                     }
                 </div>
 
-                <div className={`w-[25%] h-screen bg-secondary addNewUserSection ${addNewFriends && "openNewFriends"}`}>
+                <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"} bg-secondary addNewUserSection ${addNewFriends && "openNewFriends"}`}>
                     <div>
                         <div className='flex'>
                             <p className='text-primary px-6 py-8 text-xl'>Other Users</p>
@@ -683,9 +706,9 @@ const Dashboard = () => {
                 </div>
 
                 {
-                    popUp && <div className=' h-[100vh] w-[100vw] bg-[#00000074] absolute top-0 left-0 popupDetails'>
+                    popUp && <div className={` h-[100vh] w-[100vw] bg-[#00000074] absolute top-0 left-0 popupDetails`}>
 
-                        <div className='center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative'>
+                        <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "bg-[#282C35] text-white shadow-black" : "bg-secondary"}`}>
                             <figure className='rounded-full flex justify-center items-center'>
                                 <img src={messagesData.ReciverImage} alt="Image" className='rounded-full popupImage' />
                             </figure>

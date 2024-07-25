@@ -22,3 +22,6 @@ export const DeleteChatRoute = `${defaultRoute}/delteConversation`
 
 export const DeleteMessageRoute = `${defaultRoute}/deleteMessage`
 export const DeleteAccoutRoute = `${defaultRoute}/account`
+
+
+export const UpdateThemeRoute = `${defaultRoute}/updateTheme`
