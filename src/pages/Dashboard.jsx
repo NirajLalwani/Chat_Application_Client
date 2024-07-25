@@ -573,7 +573,7 @@ const Dashboard = () => {
 
                                                             {
 
-                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? " bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : `bg-secondary rounded-b-lg rounded-tr-lg  mr-auto ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"}`}`}
+                                                                <div className={`p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointer   ${senderId == userData.userId ? " bg-primary rounded-b-lg rounded-tl-lg  ml-auto text-white" : `bg-secondary rounded-b-lg rounded-tr-lg  mr-auto ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}`}
                                                                     style={{ wordWrap: 'break-word' }}
                                                                     onDoubleClick={(e) => {
                                                                         setMessageDetails({
