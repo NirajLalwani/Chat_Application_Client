@@ -315,6 +315,12 @@ const Dashboard = () => {
 
             const data = await response.json();
             socket.emit('getMessagesAfterDelete', { senderId: userData.userId, receiverId: messagesData.ReceiverId, conversationId: messagesData.conversationId })
+            toast("Message Deleted Successfully!", {
+                style: {
+                    backgroundColor: '#282C35', // Custom background color
+                    color: '#000' // Custom text color
+                }
+            });
             setShowDoubleClickPopUp(false);
         }
     }
@@ -555,7 +561,7 @@ const Dashboard = () => {
                                                             {
                                                                 (index === 0) ? (
 
-                                                                    <div className={`px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary ${userData.theme === "dark" ? "!bg-[#282C35] !text-white !border-none" : "bg-secondary"} `}
+                                                                    <div className={`px-2 py-1 border rounded-lg text-sm mx-auto text-black  message bg-secondary ${userData.theme === "dark" ? "!bg-[#282C35] !text-white border-none" : "bg-secondary"} `}
                                                                         style={{ wordWrap: 'break-word' }}
                                                                     >
                                                                         {date}
