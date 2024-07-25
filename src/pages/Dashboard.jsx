@@ -391,7 +391,7 @@ const Dashboard = () => {
                                 <p className='text-sm  border-b-2 py-1'>Email:- <span className='font-bold'> {userData.email} </span></p>
                                 <div className='flex gap-3 border-b-2 py-1 text-sm items-center'>
                                     <p>Theme:- </p>
-                                    <select value={userData.theme} className='px-2 py-1 rounded-sm border border-slate-600 bg-transparent cursor-pointer' onChange={async () => {
+                                    <select value={userData.theme} className='px-2 rounded-sm border border-slate-600 bg-transparent cursor-pointer ' onChange={async () => {
                                         await fetch(UpdateThemeRoute, {
                                             method: "PATCH",
                                             headers: {
