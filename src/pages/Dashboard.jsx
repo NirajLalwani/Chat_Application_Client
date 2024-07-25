@@ -315,6 +315,7 @@ const Dashboard = () => {
 
             const data = await response.json();
             socket.emit('getMessagesAfterDelete', { senderId: userData.userId, receiverId: messagesData.ReceiverId, conversationId: messagesData.conversationId })
+
             setShowDoubleClickPopUp(false);
         }
     }
@@ -618,115 +619,115 @@ const Dashboard = () => {
                                                                         setShowDoubleClickPopUp(false)
                                                                         await navigator.clipboard.writeText(messageDetails.message);
                                                                         e.target.innerText = 'Copied!';
-                                                                        toast("Message Copied!", {
+                                                                        toast.success("Message Copied!", {
                                                                             style: {
-                                                                                backgroundColor: userData.theme === 'dark' && '#282C35',
-                                                                                color: userData.theme === 'dark' && '#fff'
+                                                                                backgroundColor: userData.theme === 'dark' && '#282C35', // Custom background color
+                                                                                color: userData.theme === 'dark' && '#fff' // Custom text color
                                                                             }
-                                                                        });)
+                                                                        })
                                                                     }}
                                                                 >Copy Message</button>
+                                                            </div>
                                                         </div>
-                                                    </div>
                                                     </div>
                                                 }
 
-                                </div>
-                                ) : (
+                                            </div>
+                                        ) : (
 
-                                <div>
-                                    <h3 className='text-center my-[20vh]'>No Messages</h3>
-                                </div>
-                                )
+                                            <div>
+                                                <h3 className='text-center my-[20vh]'>No Messages</h3>
+                                            </div>
+                                        )
                                     }
-                            </div>
-                    <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
-                        <Input placeholder='Type Your Message...' name='text' type='text' className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`} value={messageToBeSend}
-                            onChange={(e) => {
-                                setMessageToBeSend(e.target.value)
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    sendMessage();
-                                }
-                            }}
-                        />
-                        <div className='flex justify-center items-center' onClick={() => {
-                            sendMessage();
-                        }}>
-                            <LuSend className='bg-primary p-3 rounded-lg box-content text-white cursor-pointer ' />
-                        </div>
-
-                    </div>
-                </> :
-                <h3 className='text-center my-[50vh] translate-y-[-50%] font-semibold'>No Conversation is Selected</h3>
-                    }
-            </div>
-
-            <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "!bg-[#282C35]" : "bg-secondary"} addNewUserSection ${addNewFriends && "openNewFriends"}`}>
-                <div>
-                    <div className='flex'>
-                        <p className='text-primary px-6 py-8 text-xl'>Other Users</p>
-                        <div className="close-newUsers ml-auto  text-white" onClick={() => { setAddNewFriends(false) }}>
-                            <IoMdClose className='bg-red-600 text-xl rounded-full cursor-pointer' />
-                        </div>
-                    </div>
-                </div>
-                <div className='overflow-y-scroll h-[67vh] px-6  no-scrollbar '>
-                    {
-                        (filterUsers && filterUsers.length > 0) && filterUsers.map(({ fullName, image, _id, email }, index) => {
-                            return <>
-                                {
-                                    _id !== userData.userId &&
-                                    <div className={`px-3 flex items-center py-3  border-b border-bottom-gray-680 cursor-pointer hover:bg-[#cdecfba8]`} key={index} onClick={() => {
-                                        setMessagesData({
-                                            ReceiverId: _id,
-                                            ReceiverName: fullName,
-                                            ReciverImage: image,
-                                            messages: [],
-                                            conversationId: 'new',
-                                            ReceiverEmail: email
-                                        })
-                                        setAddNewFriends(false)
-                                        setConversationOpen(true)
+                                </div>
+                                <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
+                                    <Input placeholder='Type Your Message...' name='text' type='text' className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`} value={messageToBeSend}
+                                        onChange={(e) => {
+                                            setMessageToBeSend(e.target.value)
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                sendMessage();
+                                            }
+                                        }}
+                                    />
+                                    <div className='flex justify-center items-center' onClick={() => {
+                                        sendMessage();
                                     }}>
-                                        <div className='w-[80px]'>
-                                            <img src={image} alt="" className='rounded-full conversationImage  border-primary border-2' />
-                                        </div>
-                                        <div className='ml-3 w-[100%]'>
-                                            <h3 className='text-lg font-semibold flex justify-between items-center w-[100%]'>
+                                        <LuSend className='bg-primary p-3 rounded-lg box-content text-white cursor-pointer ' />
+                                    </div>
 
-                                                <span>{fullName}</span>
-                                                <span className={`h-3 w-3 rounded-full ${onlineUsers.find(curr => curr.userId === _id) ? "bg-green-600" : "bg-red-600"}`}></span>
-                                            </h3>
-                                            <p className='text-[12px] font-light'>{email}</p>
-                                        </div>
-                                    </div >
-                                }
-                            </>
-                        })
+                                </div>
+                            </> :
+                            <h3 className='text-center my-[50vh] translate-y-[-50%] font-semibold'>No Conversation is Selected</h3>
                     }
                 </div>
 
-            </div>
-
-            {
-                popUp && <div className={` h-[100vh] w-[100vw] bg-[#00000074] absolute top-0 left-0 popupDetails`}>
-
-                    <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "bg-[#282C35]  shadow-black" : "bg-white"}`}>
-                        <figure className='rounded-full flex justify-center items-center'>
-                            <img src={messagesData.ReciverImage} alt="Image" className='rounded-full popupImage' />
-                        </figure>
-                        <div className='text-center'>
-                            <h4 className='text-xl font-semibold'>{messagesData.ReceiverName}</h4>
-                            <p className='text-sm font-light'>{messagesData.ReceiverEmail}</p>
+                <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "!bg-[#282C35]" : "bg-secondary"} addNewUserSection ${addNewFriends && "openNewFriends"}`}>
+                    <div>
+                        <div className='flex'>
+                            <p className='text-primary px-6 py-8 text-xl'>Other Users</p>
+                            <div className="close-newUsers ml-auto  text-white" onClick={() => { setAddNewFriends(false) }}>
+                                <IoMdClose className='bg-red-600 text-xl rounded-full cursor-pointer' />
+                            </div>
                         </div>
-                        <IoMdClose className='absolute top-5 right-5 text-2xl border rounded-full p-1 cursor-pointer' onClick={() => { setPopUp(false) }} />
                     </div>
-                </div>
-            }
+                    <div className='overflow-y-scroll h-[67vh] px-6  no-scrollbar '>
+                        {
+                            (filterUsers && filterUsers.length > 0) && filterUsers.map(({ fullName, image, _id, email }, index) => {
+                                return <>
+                                    {
+                                        _id !== userData.userId &&
+                                        <div className={`px-3 flex items-center py-3  border-b border-bottom-gray-680 cursor-pointer hover:bg-[#cdecfba8]`} key={index} onClick={() => {
+                                            setMessagesData({
+                                                ReceiverId: _id,
+                                                ReceiverName: fullName,
+                                                ReciverImage: image,
+                                                messages: [],
+                                                conversationId: 'new',
+                                                ReceiverEmail: email
+                                            })
+                                            setAddNewFriends(false)
+                                            setConversationOpen(true)
+                                        }}>
+                                            <div className='w-[80px]'>
+                                                <img src={image} alt="" className='rounded-full conversationImage  border-primary border-2' />
+                                            </div>
+                                            <div className='ml-3 w-[100%]'>
+                                                <h3 className='text-lg font-semibold flex justify-between items-center w-[100%]'>
 
-        </div >
+                                                    <span>{fullName}</span>
+                                                    <span className={`h-3 w-3 rounded-full ${onlineUsers.find(curr => curr.userId === _id) ? "bg-green-600" : "bg-red-600"}`}></span>
+                                                </h3>
+                                                <p className='text-[12px] font-light'>{email}</p>
+                                            </div>
+                                        </div >
+                                    }
+                                </>
+                            })
+                        }
+                    </div>
+
+                </div>
+
+                {
+                    popUp && <div className={` h-[100vh] w-[100vw] bg-[#00000074] absolute top-0 left-0 popupDetails`}>
+
+                        <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "bg-[#282C35]  shadow-black" : "bg-white"}`}>
+                            <figure className='rounded-full flex justify-center items-center'>
+                                <img src={messagesData.ReciverImage} alt="Image" className='rounded-full popupImage' />
+                            </figure>
+                            <div className='text-center'>
+                                <h4 className='text-xl font-semibold'>{messagesData.ReceiverName}</h4>
+                                <p className='text-sm font-light'>{messagesData.ReceiverEmail}</p>
+                            </div>
+                            <IoMdClose className='absolute top-5 right-5 text-2xl border rounded-full p-1 cursor-pointer' onClick={() => { setPopUp(false) }} />
+                        </div>
+                    </div>
+                }
+
+            </div >
             <ToastContainer
                 position="top-right"
                 hideProgressBar={false}
