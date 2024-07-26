@@ -532,10 +532,10 @@ const Dashboard = () => {
                                             {
                                                 showMoreOptions &&
                                                 <div className={`flex absolute top-[52px] right-[-40px]  text-sm  flex-col z-50 text-center ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}>
-                                                    <p className='border-b-2 border-black-400 pb-1 cursor-pointer hover:bg-[#e8ebf7] p-3' onClick={() => clearChat()}>
+                                                    <p className={`border-b-2 border-black-400 pb-1 cursor-pointer ${userData.theme === 'dark' ? "hover:bg-[#343A46]" : "hover:bg-[#e8ebf7]"} p-3`} onClick={() => clearChat()}>
                                                         Clear Chat
                                                     </p>
-                                                    <p className='border-b-2 border-black-400 pb-1 cursor-pointer w-full hover:bg-[#e8ebf7] p-3' onClick={() => delteConversation()}>
+                                                    <p className={`border-b-2 border-black-400 pb-1 cursor-pointer w-full ${userData.theme === 'dark' ? "hover:bg-[#343A46]" : "hover:bg-[#e8ebf7]"} p-3 `} onClick={() => delteConversation()}>
                                                         Delete Conversation
                                                     </p>
                                                 </div>
