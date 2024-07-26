@@ -525,13 +525,13 @@ const Dashboard = () => {
                                                 }
                                             </p>
                                         </div>
-                                        <div className={`cursor-pointer ${showMoreOptions && "bg-white"} rounded-full relative`}
+                                        <div className={`cursor-pointer ${showMoreOptions && "bg-white"} rounded-full relative ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}
                                             onClick={() => showMoreOptions ? setShowMoreOptions(false) : setShowMoreOptions(true)}
                                         >
                                             <BsThreeDotsVertical className='m-2' />
                                             {
                                                 showMoreOptions &&
-                                                <div className={`flex absolute top-[52px] right-[-40px] bg-secondary text-sm  flex-col z-50 text-center`}>
+                                                <div className={`flex absolute top-[52px] right-[-40px]  text-sm  flex-col z-50 text-center ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}>
                                                     <p className='border-b-2 border-black-400 pb-1 cursor-pointer hover:bg-[#e8ebf7] p-3' onClick={() => clearChat()}>
                                                         Clear Chat
                                                     </p>
@@ -714,7 +714,7 @@ const Dashboard = () => {
                 {
                     popUp && <div className={` h-[100vh] w-[100vw] bg-[#00000074] absolute top-0 left-0 popupDetails`}>
 
-                        <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "bg-[#282C35]  shadow-black" : "bg-white"}`}>
+                        <div className={`center h-[320px] w-[300px]  flex-col gap-2 bg-white rounded-lg flex justify-center items-center shadow-lg shadow-white relative ${userData.theme === "dark" ? "!bg-[#282C35]  !shadow-black" : "!bg-white"}`}>
                             <figure className='rounded-full flex justify-center items-center'>
                                 <img src={messagesData.ReciverImage} alt="Image" className='rounded-full popupImage' />
                             </figure>
