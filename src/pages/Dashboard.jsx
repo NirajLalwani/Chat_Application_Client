@@ -505,7 +505,7 @@ const Dashboard = () => {
 
                                                         latestMessage &&
                                                         <p className='text-[12px] font-light w-[100%] break-words conversationEmail flex justify-between items-center'>
-                                                            <span>{latestMessage.substring(0, 10)}...</span>
+                                                            <span>{latestMessage.substring(0, 20)} ...</span>
                                                             <span>{time}</span>
                                                         </p>
                                                     }
