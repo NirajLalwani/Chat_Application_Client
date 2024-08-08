@@ -34,7 +34,7 @@ const Dashboard = () => {
     }
 
     //&Search User
-    const [searchUser, setSearchUser] = useState("");
+    const [searchUser, setSearchUser] = useState(".");
     const [FinalFilteredUser, setFinalFilteredUser] = useState(filterUsers)
 
     useEffect(() => {
