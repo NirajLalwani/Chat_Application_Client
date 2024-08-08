@@ -7,6 +7,7 @@ import { useUserContext } from '../context/UserContext'
 import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute, DeleteAccoutRoute, UpdateThemeRoute } from '../utils/routes'
 import { io } from 'socket.io-client'
 
+//*For React-Icons
 import { LuSend } from "react-icons/lu";
 import { HiUserAdd } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io";
@@ -14,29 +15,39 @@ import { IoMdArrowBack } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { MdOutlineLogout } from "react-icons/md";
+
 const Dashboard = () => {
 
-    const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter, setUserData } = useUserContext();
+    const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter, setUserData, setFilterConversation } = useUserContext();
     const navigate = useNavigate();
 
-
+    //&Navigate User To Login Page if it is not login
     useEffect(() => {
         if (!isLoggedIn) {
             navigate('users/sign_in');  //?Navigting to signin page
         }
     }, [isLoggedIn])
 
+    //&If data is not Fetched showing loading...
     if (!userData || !userConversation) {
         return <h1>Loading.....</h1>  //?Showing Loading userdata and userConversation is not available
     }
 
+    //&Search User
+    const [searchUser, setSearchUser] = useState("");
+    const [FinalFilteredUser, setFinalFilteredUser] = useState(filterUsers)
+
+    useEffect(() => {
+        setFinalFilteredUser(filterUsers)
+    }, [])
+
     //&Message section more options
     const [showMoreOptions, setShowMoreOptions] = useState(false)
 
-    //&User Details Pop up
+    //&Reciver Details Pop up
     const [popUp, setPopUp] = useState(false)
 
-    //&For Settings
+    //&Settings Pop up
     const [showSettings, setShowSettings] = useState(false)
 
     //&For Responsive Design
@@ -49,6 +60,8 @@ const Dashboard = () => {
 
     //&DoubleClickMessageDeleteCopy
     const [showDoubleClickPopUp, setShowDoubleClickPopUp] = useState(false)
+
+    //&Details of Message which user double clicked
     const [messageDetails, setMessageDetails] = useState({
         senderId: "",
         receiverId: "",
@@ -57,15 +70,17 @@ const Dashboard = () => {
         showDelete: false
     })
 
+    //&Socket io for real time communition
     //******************************************************************************************************************************  */
     //&Socket Io
     // const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
     const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
-    //?For addUser and getUser in socket
+    //?For addUser and getUser in socket and setting all user which are online to onlineUsers state
     useEffect(() => {
         socket.emit('addUser', userData.userId)
+
         socket.on('getUsers', (users) => {
             setOnlineUsers(users)
         })
@@ -81,11 +96,11 @@ const Dashboard = () => {
     //?For getting Messages/getConversation/clearChat
     useEffect(() => {
         socket.on('getMessage', (data) => {
-
             setMessagesData(prev => ({
                 ...prev,
-                messages: [...prev.messages, data]
+                messages: [...prev.messages, data],
             }));
+
         });
 
         socket.on('getConversation', (data) => {
@@ -108,6 +123,8 @@ const Dashboard = () => {
                 messages: []
             }))
         })
+
+
         socket.on('getMessagessAfterDeleting', (data) => {
             setMessagesData(prev => ({
                 ...prev,
@@ -121,25 +138,30 @@ const Dashboard = () => {
 
     //?For Getting Latest Messages
     useEffect(() => {
-        socket.on('getLatestMessage', (data) => {
-            if (userConversation.length > 0) {
-                let allConversation = userConversation
-                let index = allConversation.findIndex((curr) => {
-                    return curr.ConversationId === data.conversationId;
-                })
+        socket.on('getTypingMessage', (data) => {
+            setUserConversations(prevConversations => {
+                let temp = [...prevConversations];
+                let index = temp.findIndex(curr => curr.ConversationId === data.conversationId);
                 if (index !== -1) {
-                    console.log("CALLED");
-                    if (data.ClearChat == true) {
-                        allConversation[index].latestMessage = ""
-                    } else {
-                        allConversation[index].latestMessage = data.message
-                        allConversation[index].time = data.time
-
-                    }
-                    setUserConversations(allConversation);
+                    temp[index].ReceiverTypingMessage = data.typingMessage;
                 }
-            }
-        })
+                return temp;
+            });
+
+
+            setMessagesData(prevMessagesData => {
+
+                if (prevMessagesData.ReceiverId === data.receiverId) {
+                    return {
+                        ...prevMessagesData,
+                        TypingMessage: data.typingMessage
+                    };
+                }
+                return prevMessagesData;
+            });
+        });
+
+
         socket.on('getDelteConversation', (data) => {
             let allConversations = userConversation;
             let index = allConversations.findIndex(curr => curr.conversationId === messagesData.conversationId);
@@ -176,7 +198,7 @@ const Dashboard = () => {
 
 
 
-    const fetchMessages = async (ConversationId, Name, Img, Id, Email) => {
+    const fetchMessages = async (ConversationId, Name, Img, Id, Email, ReceiverTypingMessage) => {
         scrollToBottom();
         const response = await fetch(`${GetMessageRoute}/${ConversationId}`)
         const resData = await response.json();
@@ -186,7 +208,8 @@ const Dashboard = () => {
             ReciverImage: Img,
             messages: resData.Data,
             conversationId: ConversationId,
-            ReceiverEmail: Email
+            ReceiverEmail: Email,
+            TypingMessage: ReceiverTypingMessage
         })
     }
 
@@ -230,9 +253,14 @@ const Dashboard = () => {
         return data._id;
     }
 
-
     const sendMessage = async () => {
         scrollToBottom();
+        socket.emit("updateCurrentlyTypingMessage", {
+            typingMessage: "",
+            conversationId: messagesData.conversationId,
+            receiverId: messagesData.ReceiverId,
+            senderId: userData.userId
+        })
 
         if (messagesData.conversationId === 'new') {
             var NewConversationId = await CreateConversation();
@@ -299,7 +327,6 @@ const Dashboard = () => {
         }
     }
 
-
     const deleteMessage = async () => {
         const response = await fetch(DeleteMessageRoute, {
             method: "DELETE",
@@ -334,8 +361,8 @@ const Dashboard = () => {
         if (res.ok) {
             socket.emit('deleteConversation', { senderId: userData.userId, receiverId: messagesData.ReceiverId })
         }
-
     }
+
     const clearChat = async () => {
         setShowMoreOptions(false)
         const res = await fetch(ClearChatRoute, {
@@ -455,10 +482,10 @@ const Dashboard = () => {
                         <div className='overflow-y-scroll h-[67vh] px-6 mt-3 no-scrollbar vh60'>
                             {
                                 userConversation.length > 0 ?
-                                    userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email, latestMessage, time }, index) => {
+                                    userConversation.map(({ fullName, image, ConversationId, userId, status = 'online', email, latestMessage, time, ReceiverTypingMessage }, index) => {
                                         return <>
                                             <div className={`px-3 flex items-center py-2  border-b border-bottom-gray-680 border-[5x] cursor-pointer ${userId === messagesData.ReceiverId ? "bg-[#cdecfba8]" : ""} hover:bg-[#cdecfba8]`} key={index} onClick={() => {
-                                                fetchMessages(ConversationId, fullName, image, userId, email)
+                                                fetchMessages(ConversationId, fullName, image, userId, email, ReceiverTypingMessage)
                                                 setConversationOpen(true)
                                             }
                                             }
@@ -593,9 +620,22 @@ const Dashboard = () => {
 
                                                             }
 
+
+
                                                         </>
                                                     )
                                                     )
+                                                }
+                                                {
+                                                    messagesData.TypingMessage.length > 0 &&
+                                                    <div className={`flex items-center p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointerbg-secondary rounded-b-lg rounded-tr-lg  mr-auto ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}>
+                                                        {messagesData.TypingMessage}
+                                                        <div className='flex mx-1 items-center'>
+                                                            <span className="dot dot-1 h-[5px] w-[5px] rounded-full m-[2px] bg-white"></span>
+                                                            <span className="dot dot-2 h-[5px] w-[5px] rounded-full m-[2px] bg-white"></span>
+                                                            <span className="dot dot-3 h-[5px] w-[5px] rounded-full m-[2px] bg-white"></span>
+                                                        </div>
+                                                    </div >
                                                 }
 
                                                 {
@@ -642,9 +682,21 @@ const Dashboard = () => {
                                     }
                                 </div>
                                 <div className="w-full px-4 flex  gap-1" onClick={() => setShowMoreOptions(false)}>
-                                    <Input placeholder='Type Your Message...' name='text' type='text' className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`} value={messageToBeSend}
+                                    <Input
+                                        placeholder='Type Your Message...'
+                                        name='text'
+                                        type='text'
+                                        className={`cursor-text shadow-xl my-3 focus:outline-none focus:border-[secondary] width-[90%] sendMessage ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}
+                                        value={messageToBeSend}
                                         onChange={(e) => {
                                             setMessageToBeSend(e.target.value)
+                                            socket.emit("updateCurrentlyTypingMessage", {
+                                                typingMessage: e.target.value,
+                                                conversationId: messagesData.conversationId,
+                                                receiverId: messagesData.ReceiverId,
+                                                senderId: userData.userId
+
+                                            })
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
@@ -662,20 +714,25 @@ const Dashboard = () => {
                             </> :
                             <h3 className='text-center my-[50vh] translate-y-[-50%] font-semibold'>No Conversation is Selected</h3>
                     }
-                </div>
+                </div >
 
                 <div className={`w-[25%] h-screen ${userData.theme === "dark" ? "!bg-[#282C35]" : "bg-secondary"} addNewUserSection ${addNewFriends && "openNewFriends"}`}>
                     <div>
                         <div className='flex'>
-                            <p className='text-primary px-6 py-8 text-xl'>Other Users</p>
+                            <p className='text-primary px-6 pt-8 pb-4 text-xl'>Other Users</p>
                             <div className="close-newUsers ml-auto  text-white" onClick={() => { setAddNewFriends(false) }}>
                                 <IoMdClose className='bg-red-600 text-xl rounded-full cursor-pointer' />
                             </div>
                         </div>
                     </div>
                     <div className='overflow-y-scroll h-[67vh] px-6  no-scrollbar '>
+                        <Input placeholder='Search User' value={searchUser} className={`${userData.theme === "dark" ? "!bg-[#282C35] text-white" : "bg-secondary"} outline-none`} onChange={(e) => {
+                            setSearchUser(e.target.value)
+                            let temp = filterUsers.filter(curr => (curr.fullName.includes(e.target.value) || curr.email.includes(e.target.value)));
+                            setFinalFilteredUser([...temp]);
+                        }} />
                         {
-                            (filterUsers && filterUsers.length > 0) && filterUsers.map(({ fullName, image, _id, email }, index) => {
+                            (FinalFilteredUser && FinalFilteredUser.length > 0) && FinalFilteredUser.map(({ fullName, image, _id, email }, index) => {
                                 return <>
                                     {
                                         _id !== userData.userId &&

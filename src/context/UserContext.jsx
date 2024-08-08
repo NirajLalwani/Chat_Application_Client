@@ -17,7 +17,8 @@ const UserContextProvider = ({ children }) => {
         ReceiverImage: "",
         ReceiverEmail: "",
         messages: [],
-        conversationId: ""
+        conversationId: "",
+        ReceiverTypingMessage: ""
     })
 
 
@@ -68,7 +69,6 @@ const UserContextProvider = ({ children }) => {
             // Return true to include user if there's no conversation found
             return !hasConversation;
         });
-
         setFilterConversation(filteredUsers);
     }
     useEffect(() => {
@@ -88,7 +88,7 @@ const UserContextProvider = ({ children }) => {
 
     return (
         <>
-            <Context.Provider value={{ isLoggedIn, AuthorizeUser, userData, userConversation, users, messagesData, setMessagesData, filterUsers, setIsLoggedIn, setUserConversations, filter, setUserData }}>
+            <Context.Provider value={{ isLoggedIn, AuthorizeUser, userData, userConversation, users, messagesData, setMessagesData, filterUsers, setIsLoggedIn, setUserConversations, filter, setUserData, setFilterConversation }}>
                 {children}
             </Context.Provider >
         </>
