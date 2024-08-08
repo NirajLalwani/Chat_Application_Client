@@ -34,12 +34,12 @@ const Dashboard = () => {
     }
 
     //&Search User
-    const [searchUser, setSearchUser] = useState(".");
+    const [searchUser, setSearchUser] = useState("");
     const [FinalFilteredUser, setFinalFilteredUser] = useState(filterUsers)
 
     useEffect(() => {
         setFinalFilteredUser(filterUsers)
-    }, [])
+    }, [filterUsers])
 
     //&Message section more options
     const [showMoreOptions, setShowMoreOptions] = useState(false)
@@ -75,6 +75,7 @@ const Dashboard = () => {
     //&Socket Io
     // const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
     const [socket, setSocket] = useState(io("https://chat-application-backend-8jfk.onrender.com"));
+    // const [socket, setSocket] = useState(io("http://localhost:8000"));
     const [onlineUsers, setOnlineUsers] = useState([])
 
     //?For addUser and getUser in socket and setting all user which are online to onlineUsers state
