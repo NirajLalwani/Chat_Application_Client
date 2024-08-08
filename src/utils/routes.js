@@ -25,3 +25,4 @@ export const DeleteAccoutRoute = `${defaultRoute}/account`
 
 
 export const UpdateThemeRoute = `${defaultRoute}/updateTheme`
+export const LiveMessageRoute = `${defaultRoute}/liveMessage`

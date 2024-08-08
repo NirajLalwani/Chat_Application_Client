@@ -4,7 +4,8 @@ import Input from '../components/Input'
 import { ToastContainer, toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useUserContext } from '../context/UserContext'
-import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute, DeleteAccoutRoute, UpdateThemeRoute } from '../utils/routes'
+
+import { GetMessageRoute, SendMessageRoute, CreateConversationRoute, ClearChatRoute, DeleteChatRoute, DeleteMessageRoute, DeleteAccoutRoute, UpdateThemeRoute, LiveMessageRoute } from '../utils/routes'
 import { io } from 'socket.io-client'
 
 //*For React-Icons
@@ -15,7 +16,6 @@ import { IoMdArrowBack } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { MdOutlineLogout } from "react-icons/md";
-
 const Dashboard = () => {
 
     const { userData, isLoggedIn, userConversation, filterUsers, messagesData, setMessagesData, setIsLoggedIn, setUserConversations, filter, setUserData, setFilterConversation } = useUserContext();
@@ -96,6 +96,7 @@ const Dashboard = () => {
 
     //?For getting Messages/getConversation/clearChat
     useEffect(() => {
+
         socket.on('getMessage', (data) => {
             setMessagesData(prev => ({
                 ...prev,
@@ -151,14 +152,17 @@ const Dashboard = () => {
 
 
             setMessagesData(prevMessagesData => {
-
                 if (prevMessagesData.ReceiverId === data.receiverId) {
                     return {
                         ...prevMessagesData,
                         TypingMessage: data.typingMessage
                     };
+                } else {
+                    return {
+                        ...prevMessagesData,
+                        TypingMessage: ""
+                    };
                 }
-                return prevMessagesData;
             });
         });
 
@@ -201,6 +205,13 @@ const Dashboard = () => {
 
     const fetchMessages = async (ConversationId, Name, Img, Id, Email, ReceiverTypingMessage) => {
         scrollToBottom();
+        setMessageToBeSend('')
+        socket.emit("updateCurrentlyTypingMessage", {
+            typingMessage: "",
+            conversationId: messagesData.conversationId,
+            receiverId: messagesData.ReceiverId,
+            senderId: userData.userId
+        })
         const response = await fetch(`${GetMessageRoute}/${ConversationId}`)
         const resData = await response.json();
         setMessagesData({
@@ -211,7 +222,7 @@ const Dashboard = () => {
             conversationId: ConversationId,
             ReceiverEmail: Email,
             TypingMessage: ReceiverTypingMessage
-        })
+        });
     }
 
     const CreateConversation = async () => {
@@ -437,6 +448,25 @@ const Dashboard = () => {
                                         <option className={`cursor-pointer ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"} p-0 m-0`} value="dark">Dark</option>
                                     </select>
                                 </div>
+                                <div className='flex gap-3 border-b-2 py-1 text-sm items-center'>
+                                    <p>LiveMessage:- </p>
+                                    <select value={userData.LiveMessage} className='px-2 rounded-sm border border-slate-600 bg-transparent cursor-pointer ' onChange={async () => {
+                                        await fetch(LiveMessageRoute, {
+                                            method: "PATCH",
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({ _id: userData.userId })
+                                        })
+                                        setUserData({
+                                            ...userData,
+                                            LiveMessage: userData.LiveMessage === true ? false : true
+                                        })
+                                    }}>
+                                        <option className={`cursor-pointer ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"} p-0 m-0`} value={true} >On</option>
+                                        <option className={`cursor-pointer ${userData.theme === "dark" ? "bg-[#282C35] text-white" : "bg-secondary"} p-0 m-0`} value={false}>Off</option>
+                                    </select>
+                                </div>
                                 <p className="text-red-400 hover:text-red-500 hover:font-semibold text-sm border-b-2 py-1 flex items-center gap-2 cursor-pointer"
                                     onClick={
                                         () => {
@@ -488,6 +518,7 @@ const Dashboard = () => {
                                             <div className={`px-3 flex items-center py-2  border-b border-bottom-gray-680 border-[5x] cursor-pointer ${userId === messagesData.ReceiverId ? "bg-[#cdecfba8]" : ""} hover:bg-[#cdecfba8]`} key={index} onClick={() => {
                                                 fetchMessages(ConversationId, fullName, image, userId, email, ReceiverTypingMessage)
                                                 setConversationOpen(true)
+
                                             }
                                             }
                                             >
@@ -496,17 +527,15 @@ const Dashboard = () => {
                                                 </div>
                                                 <div className='ml-3 w-[100%]'>
                                                     <h3 className='text-lg font-semibold w-[100%] break-words conversationName flex justify-between items-center'>
-
                                                         <span>{fullName}</span>
                                                         <span className={`h-3 w-3 rounded-full ${onlineUsers.find(curr => curr.userId === userId) ? "bg-green-600" : "bg-red-600"}`}></span>
                                                     </h3>
 
 
                                                     {
-
                                                         latestMessage &&
                                                         <p className='text-[12px] font-light w-[100%] break-words conversationEmail flex justify-between items-center'>
-                                                            <span>{latestMessage.substring(0, 20)} ...</span>
+                                                            <span>{(latestMessage.length < 20) ? latestMessage : `${latestMessage.substring(0, 20)}...`} </span>
                                                             <span>{time}</span>
                                                         </p>
                                                     }
@@ -537,7 +566,15 @@ const Dashboard = () => {
                         messagesData.ReceiverName ?
                             <>
                                 <div className={`w-[80%] px-8  h-[60px] mt-6 rounded-full flex justify-start items-center gap-3 p-9 mb-3 ${userData.theme === "dark" ? "bg-[#282C35]" : "bg-secondary"} `}>
-                                    <IoMdArrowBack className='text-xl cursor-pointer arrow' onClick={() => { setConversationOpen(false) }} />
+                                    <IoMdArrowBack className='text-xl cursor-pointer arrow' onClick={() => {
+                                        setConversationOpen(false)
+                                        socket.emit("updateCurrentlyTypingMessage", {
+                                            typingMessage: "",
+                                            conversationId: messagesData.conversationId,
+                                            receiverId: messagesData.ReceiverId,
+                                            senderId: userData.userId
+                                        })
+                                    }} />
                                     <figure className='w-[80px]'>
                                         <img src={messagesData.ReciverImage} alt="" className='conversationImage rounded-full  border-primary border-2 cursor-pointer' onClick={() => {
                                             setPopUp(true)
@@ -628,10 +665,10 @@ const Dashboard = () => {
                                                     )
                                                 }
                                                 {
-                                                    messagesData.TypingMessage.length > 0 &&
+                                                    (messagesData.TypingMessage.length > 0 && messagesData.TypingMessage !== "") &&
                                                     <div className={`flex items-center p-3 py-1 pr-11 message max-w-[52%] text-sm  cursor-pointerbg-secondary rounded-b-lg rounded-tr-lg  mr-auto ${userData.theme === "dark" ? "!bg-[#282C35] !text-white" : "bg-secondary"}`}>
-                                                        {messagesData.TypingMessage}
-                                                        <div className='flex mx-1 items-center'>
+                                                        {userData.LiveMessage && messagesData.TypingMessage}
+                                                        <div className='flex my-1 items-center'>
                                                             <span className="dot dot-1 h-[5px] w-[5px] rounded-full m-[2px] bg-white"></span>
                                                             <span className="dot dot-2 h-[5px] w-[5px] rounded-full m-[2px] bg-white"></span>
                                                             <span className="dot dot-3 h-[5px] w-[5px] rounded-full m-[2px] bg-white"></span>
@@ -691,12 +728,12 @@ const Dashboard = () => {
                                         value={messageToBeSend}
                                         onChange={(e) => {
                                             setMessageToBeSend(e.target.value)
+                                            console.log("Called");
                                             socket.emit("updateCurrentlyTypingMessage", {
-                                                typingMessage: e.target.value,
+                                                typingMessage: !userData.LiveMessage ? e.target.value === "" ? "" : " " : e.target.value,
                                                 conversationId: messagesData.conversationId,
                                                 receiverId: messagesData.ReceiverId,
                                                 senderId: userData.userId
-
                                             })
                                         }}
                                         onKeyDown={(e) => {
